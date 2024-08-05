@@ -8,6 +8,7 @@ func main() {
     greet("Alice")
     fmt.Println("Hello, World!")
     sum(5, 3)
+    subtract(10, 4)
 }
 
 func greet(name string) {
@@ -17,4 +18,9 @@ func greet(name string) {
 func sum(a, b int) {
     result := a + b
     fmt.Printf("The sum of %d and %d is %d\n", a, b, result)
+}
+
+func subtract(a, b int) {
+    result := a - b
+    fmt.Printf("The difference between %d and %d is %d\n", a, b, result)
 }
