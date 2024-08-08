@@ -7,36 +7,35 @@ import (
 func main() {
     greet("Alice")
     fmt.Println("Hello, World!")
-    sum(5, 3)
-    subtract(10, 4)
-    multiply(7, 6)
-    divide(20, 4)
+    
+    a, b := 5, 3
+    sumResult := sum(a, b)
+    subtractResult := subtract(10, 4)
+    multiplyResult := multiply(7, 6)
+    divideResult := divide(20, 4)
+
+    fmt.Printf("Results: Sum=%d, Subtract=%d, Multiply=%d, Divide=%s\n", sumResult, subtractResult, multiplyResult, divideResult)
 }
 
 func greet(name string) {
     fmt.Printf("Hello, %s!\n", name)
 }
 
-func sum(a, b int) {
-    result := a + b
-    fmt.Printf("The sum of %d and %d is %d\n", a, b, result)
+func sum(a, b int) int {
+    return a + b
 }
 
-func subtract(a, b int) {
-    result := a - b
-    fmt.Printf("The difference between %d and %d is %d\n", a, b, result)
+func subtract(a, b int) int {
+    return a - b
 }
 
-func multiply(a, b int) {
-    result := a * b
-    fmt.Printf("The product of %d and %d is %d\n", a, b, result)
+func multiply(a, b int) int {
+    return a * b
 }
 
-func divide(a, b int) {
+func divide(a, b int) string {
     if b == 0 {
-        fmt.Println("Error: Division by zero")
-        return
+        return "Error: Division by zero"
     }
-    result := a / b
-    fmt.Printf("The division of %d by %d is %d\n", a, b, result)
+    return fmt.Sprintf("%d", a/b)
 }
