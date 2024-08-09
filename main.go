@@ -7,12 +7,17 @@ import (
 func main() {
     greet("Alice")
     fmt.Println("Hello, World!")
-    
-    a, b := 5, 3
+
+    var a, b int
+    fmt.Print("Enter first number: ")
+    fmt.Scan(&a)
+    fmt.Print("Enter second number: ")
+    fmt.Scan(&b)
+
     sumResult := sum(a, b)
-    subtractResult := subtract(10, 4)
-    multiplyResult := multiply(7, 6)
-    divideResult := divide(20, 4)
+    subtractResult := subtract(a, b)
+    multiplyResult := multiply(a, b)
+    divideResult := divide(a, b)
 
     fmt.Printf("Results: Sum=%d, Subtract=%d, Multiply=%d, Divide=%s\n", sumResult, subtractResult, multiplyResult, divideResult)
 }
