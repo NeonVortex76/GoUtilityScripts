@@ -2,6 +2,7 @@ package main
 
 import (
     "fmt"
+    "log"
 )
 
 func main() {
@@ -10,9 +11,14 @@ func main() {
 
     var a, b int
     fmt.Print("Enter first number: ")
-    fmt.Scan(&a)
+    if _, err := fmt.Scan(&a); err != nil {
+        log.Fatalf("Invalid input: %v", err)
+    }
+
     fmt.Print("Enter second number: ")
-    fmt.Scan(&b)
+    if _, err := fmt.Scan(&b); err != nil {
+        log.Fatalf("Invalid input: %v", err)
+    }
 
     sumResult := sum(a, b)
     subtractResult := subtract(a, b)
