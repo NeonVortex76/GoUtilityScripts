@@ -22,12 +22,22 @@ func main() {
             log.Fatalf("Invalid input: %v", err)
         }
 
-        sumResult := sum(a, b)
-        subtractResult := subtract(a, b)
-        multiplyResult := multiply(a, b)
-        divideResult := divide(a, b)
+        fmt.Println("Choose an operation: +, -, *, /")
+        var operation string
+        fmt.Scan(&operation)
 
-        fmt.Printf("Results: Sum=%d, Subtract=%d, Multiply=%d, Divide=%s\n", sumResult, subtractResult, multiplyResult, divideResult)
+        switch operation {
+        case "+":
+            fmt.Printf("Result: %d\n", sum(a, b))
+        case "-":
+            fmt.Printf("Result: %d\n", subtract(a, b))
+        case "*":
+            fmt.Printf("Result: %d\n", multiply(a, b))
+        case "/":
+            fmt.Printf("Result: %s\n", divide(a, b))
+        default:
+            fmt.Println("Invalid operation")
+        }
         fmt.Println("---------")
     }
 }
