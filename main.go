@@ -3,6 +3,7 @@ package main
 import (
     "fmt"
     "log"
+    "strings"
 )
 
 func main() {
@@ -10,21 +11,32 @@ func main() {
     fmt.Println("Hello, World!")
 
     for {
-        var a, b int
+        var input string
         fmt.Print("Enter first number (or type 'exit' to quit): ")
-        if _, err := fmt.Scan(&a); err != nil {
-            log.Println("Invalid input. Exiting.")
+        fmt.Scan(&input)
+
+        if strings.ToLower(input) == "exit" {
+            fmt.Println("Exiting program.")
             break
         }
 
+        a, err := parseInput(input)
+        if err != nil {
+            log.Println("Invalid input. Please enter a valid number.")
+            continue
+        }
+
         fmt.Print("Enter second number: ")
-        if _, err := fmt.Scan(&b); err != nil {
-            log.Fatalf("Invalid input: %v", err)
+        fmt.Scan(&input)
+        b, err := parseInput(input)
+        if err != nil {
+            log.Println("Invalid input. Please enter a valid number.")
+            continue
         }
 
         fmt.Println("Choose an operation: +, -, *, /")
-        var operation string
-        fmt.Scan(&operation)
+        fmt.Scan(&input)
+        operation := input
 
         switch operation {
         case "+":
@@ -63,4 +75,10 @@ func divide(a, b int) string {
         return "Error: Division by zero"
     }
     return fmt.Sprintf("%d", a/b)
+}
+
+func parseInput(input string) (int, error) {
+    var num int
+    _, err := fmt.Sscan(input, &num)
+    return num, err
 }
