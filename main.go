@@ -3,6 +3,7 @@ package main
 import (
     "fmt"
     "log"
+    "math"
     "strings"
 )
 
@@ -34,7 +35,7 @@ func main() {
             continue
         }
 
-        fmt.Println("Choose an operation: +, -, *, /")
+        fmt.Println("Choose an operation: +, -, *, /, ^ (power)")
         fmt.Scan(&input)
         operation := input
 
@@ -47,6 +48,8 @@ func main() {
             fmt.Printf("Result: %d\n", multiply(a, b))
         case "/":
             fmt.Printf("Result: %s\n", divide(a, b))
+        case "^":
+            fmt.Printf("Result: %.0f\n", power(a, b))
         default:
             fmt.Println("Invalid operation")
         }
@@ -75,6 +78,10 @@ func divide(a, b int) string {
         return "Error: Division by zero"
     }
     return fmt.Sprintf("%d", a/b)
+}
+
+func power(a, b int) float64 {
+    return math.Pow(float64(a), float64(b))
 }
 
 func parseInput(input string) (int, error) {
