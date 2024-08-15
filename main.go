@@ -35,9 +35,18 @@ func main() {
             continue
         }
 
-        fmt.Println("Choose an operation: +, -, *, /, ^ (power)")
-        fmt.Scan(&input)
-        operation := input
+        var operation string
+        for {
+            fmt.Println("Choose an operation: +, -, *, /, ^ (power)")
+            fmt.Scan(&input)
+            operation = input
+
+            fmt.Printf("You chose operation '%s'. Confirm? (yes/no): ", operation)
+            fmt.Scan(&input)
+            if strings.ToLower(input) == "yes" {
+                break
+            }
+        }
 
         switch operation {
         case "+":
