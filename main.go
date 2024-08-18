@@ -56,6 +56,10 @@ func main() {
         case "*":
             fmt.Printf("Result: %d\n", multiply(a, b))
         case "/":
+            if b == 0 {
+                fmt.Println("Cannot divide by zero. Please enter a new second number.")
+                continue
+            }
             fmt.Printf("Result: %s\n", divide(a, b))
         case "^":
             fmt.Printf("Result: %.0f\n", power(a, b))
@@ -83,9 +87,6 @@ func multiply(a, b int) int {
 }
 
 func divide(a, b int) string {
-    if b == 0 {
-        return "Error: Division by zero"
-    }
     return fmt.Sprintf("%d", a/b)
 }
 
