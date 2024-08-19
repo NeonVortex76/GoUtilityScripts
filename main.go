@@ -37,7 +37,7 @@ func main() {
 
         var operation string
         for {
-            fmt.Println("Choose an operation: +, -, *, /, ^ (power)")
+            fmt.Println("Choose an operation: +, -, *, /, ^ (power), % (modulus)")
             fmt.Scan(&input)
             operation = input
 
@@ -63,6 +63,8 @@ func main() {
             fmt.Printf("Result: %s\n", divide(a, b))
         case "^":
             fmt.Printf("Result: %.0f\n", power(a, b))
+        case "%":
+            fmt.Printf("Result: %d\n", modulus(a, b))
         default:
             fmt.Println("Invalid operation")
         }
@@ -92,6 +94,10 @@ func divide(a, b int) string {
 
 func power(a, b int) float64 {
     return math.Pow(float64(a), float64(b))
+}
+
+func modulus(a, b int) int {
+    return a % b
 }
 
 func parseInput(input string) (int, error) {
