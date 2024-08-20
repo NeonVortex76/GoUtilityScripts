@@ -4,6 +4,7 @@ import (
     "fmt"
     "log"
     "math"
+    "strconv"
     "strings"
 )
 
@@ -13,61 +14,27 @@ func main() {
 
     for {
         var input string
-        fmt.Print("Enter first number (or type 'exit' to quit): ")
-        fmt.Scan(&input)
+        fmt.Print("Enter operation (e.g., '10 + 20') or type 'exit' to quit: ")
+        fmt.Scanln(&input)
 
         if strings.ToLower(input) == "exit" {
             fmt.Println("Exiting program.")
             break
         }
 
-        a, err := parseInput(input)
+        a, b, operation, err := parseInputWithOperation(input)
         if err != nil {
-            log.Println("Invalid input. Please enter a valid number.")
+            log.Println("Invalid input:", err)
             continue
         }
 
-        fmt.Print("Enter second number: ")
-        fmt.Scan(&input)
-        b, err := parseInput(input)
+        result, err := performOperation(a, b, operation)
         if err != nil {
-            log.Println("Invalid input. Please enter a valid number.")
+            log.Println("Error:", err)
             continue
         }
 
-        var operation string
-        for {
-            fmt.Println("Choose an operation: +, -, *, /, ^ (power), % (modulus)")
-            fmt.Scan(&input)
-            operation = input
-
-            fmt.Printf("You chose operation '%s'. Confirm? (yes/no): ", operation)
-            fmt.Scan(&input)
-            if strings.ToLower(input) == "yes" {
-                break
-            }
-        }
-
-        switch operation {
-        case "+":
-            fmt.Printf("Result: %d\n", sum(a, b))
-        case "-":
-            fmt.Printf("Result: %d\n", subtract(a, b))
-        case "*":
-            fmt.Printf("Result: %d\n", multiply(a, b))
-        case "/":
-            if b == 0 {
-                fmt.Println("Cannot divide by zero. Please enter a new second number.")
-                continue
-            }
-            fmt.Printf("Result: %s\n", divide(a, b))
-        case "^":
-            fmt.Printf("Result: %.0f\n", power(a, b))
-        case "%":
-            fmt.Printf("Result: %d\n", modulus(a, b))
-        default:
-            fmt.Println("Invalid operation")
-        }
+        fmt.Printf("Result: %v\n", result)
         fmt.Println("---------")
     }
 }
@@ -88,8 +55,11 @@ func multiply(a, b int) int {
     return a * b
 }
 
-func divide(a, b int) string {
-    return fmt.Sprintf("%d", a/b)
+func divide(a, b int) (string, error) {
+    if b == 0 {
+        return "", fmt.Errorf("cannot divide by zero")
+    }
+    return fmt.Sprintf("%d", a/b), nil
 }
 
 func power(a, b int) float64 {
@@ -100,8 +70,38 @@ func modulus(a, b int) int {
     return a % b
 }
 
-func parseInput(input string) (int, error) {
-    var num int
-    _, err := fmt.Sscan(input, &num)
-    return num, err
+func parseInputWithOperation(input string) (int, int, string, error) {
+    parts := strings.Fields(input)
+    if len(parts) != 3 {
+        return 0, 0, "", fmt.Errorf("input must contain exactly three parts")
+    }
+
+    a, err1 := strconv.Atoi(parts[0])
+    operation := parts[1]
+    b, err2 := strconv.Atoi(parts[2])
+
+    if err1 != nil || err2 != nil {
+        return 0, 0, "", fmt.Errorf("invalid numbers")
+    }
+
+    return a, b, operation, nil
+}
+
+func performOperation(a, b int, operation string) (interface{}, error) {
+    switch operation {
+    case "+":
+        return sum(a, b), nil
+    case "-":
+        return subtract(a, b), nil
+    case "*":
+        return multiply(a, b), nil
+    case "/":
+        return divide(a, b)
+    case "^":
+        return power(a, b), nil
+    case "%":
+        return modulus(a, b), nil
+    default:
+        return nil, fmt.Errorf("invalid operation")
+    }
 }
