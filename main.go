@@ -4,13 +4,21 @@ import (
     "fmt"
     "log"
     "math"
+    "os"
     "strconv"
     "strings"
+    "time"
 )
 
 func main() {
     greet("Alice")
     fmt.Println("Hello, World!")
+
+    file, err := os.OpenFile("results.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+    if err != nil {
+        log.Fatal(err)
+    }
+    defer file.Close()
 
     for {
         var input string
@@ -34,7 +42,15 @@ func main() {
             continue
         }
 
-        fmt.Printf("Result: %v\n", result)
+        resultStr := fmt.Sprintf("Result: %v\n", result)
+        fmt.Print(resultStr)
+
+        timestamp := time.Now().Format(time.RFC3339)
+        entry := fmt.Sprintf("%s - %s - %v\n", timestamp, input, result)
+        if _, err := file.WriteString(entry); err != nil {
+            log.Println("Error writing to file:", err)
+        }
+
         fmt.Println("---------")
     }
 }
