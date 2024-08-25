@@ -1,6 +1,7 @@
 package main
 
 import (
+    "bufio"
     "fmt"
     "log"
     "math"
@@ -21,42 +22,73 @@ func main() {
     defer file.Close()
 
     for {
-        var input string
-        fmt.Print("Enter operation (e.g., '10 + 20') or type 'exit' to quit: ")
-        fmt.Scanln(&input)
+        var choice string
+        fmt.Print("Choose an option: (1) New operation (2) View history (3) Exit: ")
+        fmt.Scanln(&choice)
 
-        if strings.ToLower(input) == "exit" {
+        switch choice {
+        case "1":
+            performNewOperation(file)
+        case "2":
+            viewHistory()
+        case "3":
             fmt.Println("Exiting program.")
-            break
+            return
+        default:
+            fmt.Println("Invalid choice. Please enter 1, 2, or 3.")
         }
-
-        a, b, operation, err := parseInputWithOperation(input)
-        if err != nil {
-            log.Println("Invalid input:", err)
-            continue
-        }
-
-        result, err := performOperation(a, b, operation)
-        if err != nil {
-            log.Println("Error:", err)
-            continue
-        }
-
-        resultStr := fmt.Sprintf("Result: %v\n", result)
-        fmt.Print(resultStr)
-
-        timestamp := time.Now().Format(time.RFC3339)
-        entry := fmt.Sprintf("%s - %s - %v\n", timestamp, input, result)
-        if _, err := file.WriteString(entry); err != nil {
-            log.Println("Error writing to file:", err)
-        }
-
         fmt.Println("---------")
     }
 }
 
 func greet(name string) {
     fmt.Printf("Hello, %s!\n", name)
+}
+
+func performNewOperation(file *os.File) {
+    var input string
+    fmt.Print("Enter operation (e.g., '10 + 20'): ")
+    fmt.Scanln(&input)
+
+    a, b, operation, err := parseInputWithOperation(input)
+    if err != nil {
+        log.Println("Invalid input:", err)
+        return
+    }
+
+    result, err := performOperation(a, b, operation)
+    if err != nil {
+        log.Println("Error:", err)
+        return
+    }
+
+    resultStr := fmt.Sprintf("Result: %v\n", result)
+    fmt.Print(resultStr)
+
+    timestamp := time.Now().Format(time.RFC3339)
+    entry := fmt.Sprintf("%s - %s - %v\n", timestamp, input, result)
+    if _, err := file.WriteString(entry); err != nil {
+        log.Println("Error writing to file:", err)
+    }
+}
+
+func viewHistory() {
+    file, err := os.Open("results.txt")
+    if err != nil {
+        log.Println("Error opening file:", err)
+        return
+    }
+    defer file.Close()
+
+    scanner := bufio.NewScanner(file)
+    fmt.Println("Calculation History:")
+    for scanner.Scan() {
+        fmt.Println(scanner.Text())
+    }
+
+    if err := scanner.Err(); err != nil {
+        log.Println("Error reading file:", err)
+    }
 }
 
 func sum(a, b int) int {
