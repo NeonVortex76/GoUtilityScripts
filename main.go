@@ -23,7 +23,7 @@ func main() {
 
     for {
         var choice string
-        fmt.Print("Choose an option: (1) New operation (2) View history (3) Exit: ")
+        fmt.Print("Choose an option: (1) New operation (2) View history (3) Clear history (4) Exit: ")
         fmt.Scanln(&choice)
 
         switch choice {
@@ -32,10 +32,12 @@ func main() {
         case "2":
             viewHistory()
         case "3":
+            clearHistory()
+        case "4":
             fmt.Println("Exiting program.")
             return
         default:
-            fmt.Println("Invalid choice. Please enter 1, 2, or 3.")
+            fmt.Println("Invalid choice. Please enter 1, 2, 3, or 4.")
         }
         fmt.Println("---------")
     }
@@ -88,6 +90,15 @@ func viewHistory() {
 
     if err := scanner.Err(); err != nil {
         log.Println("Error reading file:", err)
+    }
+}
+
+func clearHistory() {
+    err := os.Truncate("results.txt", 0)
+    if err != nil {
+        log.Println("Error clearing history:", err)
+    } else {
+        fmt.Println("History cleared.")
     }
 }
 
