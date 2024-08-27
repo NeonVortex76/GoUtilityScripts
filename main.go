@@ -11,6 +11,8 @@ import (
     "time"
 )
 
+var lastResult int
+
 func main() {
     greet("Alice")
     fmt.Println("Hello, World!")
@@ -49,8 +51,12 @@ func greet(name string) {
 
 func performNewOperation(file *os.File) {
     var input string
-    fmt.Print("Enter operation (e.g., '10 + 20'): ")
+    fmt.Print("Enter operation (e.g., '10 + 20') or type 'last' to use last result: ")
     fmt.Scanln(&input)
+
+    if strings.Contains(input, "last") {
+        input = strings.Replace(input, "last", strconv.Itoa(lastResult), 1)
+    }
 
     a, b, operation, err := parseInputWithOperation(input)
     if err != nil {
@@ -66,6 +72,8 @@ func performNewOperation(file *os.File) {
 
     resultStr := fmt.Sprintf("Result: %v\n", result)
     fmt.Print(resultStr)
+
+    lastResult = result.(int) // Сохраняем последний результат
 
     timestamp := time.Now().Format(time.RFC3339)
     entry := fmt.Sprintf("%s - %s - %v\n", timestamp, input, result)
