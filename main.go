@@ -75,8 +75,14 @@ func performNewOperation(file *os.File) {
 
     lastResult = result.(int) // Сохраняем последний результат
 
+    var comment string
+    fmt.Print("Add a comment (optional): ")
+    scanner := bufio.NewScanner(os.Stdin)
+    scanner.Scan()
+    comment = scanner.Text()
+
     timestamp := time.Now().Format(time.RFC3339)
-    entry := fmt.Sprintf("%s - %s - %v\n", timestamp, input, result)
+    entry := fmt.Sprintf("%s - %s - %v - Comment: %s\n", timestamp, input, result, comment)
     if _, err := file.WriteString(entry); err != nil {
         log.Println("Error writing to file:", err)
     }
