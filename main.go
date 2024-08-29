@@ -25,7 +25,7 @@ func main() {
 
     for {
         var choice string
-        fmt.Print("Choose an option: (1) New operation (2) View history (3) Clear history (4) Exit: ")
+        fmt.Print("Choose an option: (1) New operation (2) View history (3) View last 5 operations (4) Clear history (5) Exit: ")
         fmt.Scanln(&choice)
 
         switch choice {
@@ -34,12 +34,14 @@ func main() {
         case "2":
             viewHistory()
         case "3":
-            clearHistory()
+            viewLastFiveOperations()
         case "4":
+            clearHistory()
+        case "5":
             fmt.Println("Exiting program.")
             return
         default:
-            fmt.Println("Invalid choice. Please enter 1, 2, 3, or 4.")
+            fmt.Println("Invalid choice. Please enter 1, 2, 3, 4, or 5.")
         }
         fmt.Println("---------")
     }
@@ -100,6 +102,35 @@ func viewHistory() {
     fmt.Println("Calculation History:")
     for scanner.Scan() {
         fmt.Println(scanner.Text())
+    }
+
+    if err := scanner.Err(); err != nil {
+        log.Println("Error reading file:", err)
+    }
+}
+
+func viewLastFiveOperations() {
+    file, err := os.Open("results.txt")
+    if err != nil {
+        log.Println("Error opening file:", err)
+        return
+    }
+    defer file.Close()
+
+    scanner := bufio.NewScanner(file)
+    lines := []string{}
+
+    for scanner.Scan() {
+        lines = append(lines, scanner.Text())
+    }
+
+    if len(lines) > 5 {
+        lines = lines[len(lines)-5:]
+    }
+
+    fmt.Println("Last 5 Operations:")
+    for _, line := range lines {
+        fmt.Println(line)
     }
 
     if err := scanner.Err(); err != nil {
