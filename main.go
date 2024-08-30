@@ -25,7 +25,7 @@ func main() {
 
     for {
         var choice string
-        fmt.Print("Choose an option: (1) New operation (2) View history (3) View last 5 operations (4) Clear history (5) Exit: ")
+        fmt.Print("Choose an option: (1) New operation (2) View history (3) View last 5 operations (4) Search history (5) Clear history (6) Exit: ")
         fmt.Scanln(&choice)
 
         switch choice {
@@ -36,12 +36,14 @@ func main() {
         case "3":
             viewLastFiveOperations()
         case "4":
-            clearHistory()
+            searchHistory()
         case "5":
+            clearHistory()
+        case "6":
             fmt.Println("Exiting program.")
             return
         default:
-            fmt.Println("Invalid choice. Please enter 1, 2, 3, 4, or 5.")
+            fmt.Println("Invalid choice. Please enter 1, 2, 3, 4, 5, or 6.")
         }
         fmt.Println("---------")
     }
@@ -131,6 +133,38 @@ func viewLastFiveOperations() {
     fmt.Println("Last 5 Operations:")
     for _, line := range lines {
         fmt.Println(line)
+    }
+
+    if err := scanner.Err(); err != nil {
+        log.Println("Error reading file:", err)
+    }
+}
+
+func searchHistory() {
+    file, err := os.Open("results.txt")
+    if err != nil {
+        log.Println("Error opening file:", err)
+        return
+    }
+    defer file.Close()
+
+    var keyword string
+    fmt.Print("Enter keyword or number to search: ")
+    fmt.Scanln(&keyword)
+
+    scanner := bufio.NewScanner(file)
+    fmt.Printf("Search results for '%s':\n", keyword)
+    found := false
+    for scanner.Scan() {
+        line := scanner.Text()
+        if strings.Contains(line, keyword) {
+            fmt.Println(line)
+            found = true
+        }
+    }
+
+    if !found {
+        fmt.Println("No matching entries found.")
     }
 
     if err := scanner.Err(); err != nil {
