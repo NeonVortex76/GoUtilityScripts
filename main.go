@@ -25,7 +25,7 @@ func main() {
 
     for {
         var choice string
-        fmt.Print("Choose an option: (1) New operation (2) View history (3) View last 5 operations (4) Search history (5) Clear history (6) Exit: ")
+        fmt.Print("Choose an option: (1) New operation (2) View history (3) View last 5 operations (4) Search history (5) Export history (6) Clear history (7) Exit: ")
         fmt.Scanln(&choice)
 
         switch choice {
@@ -38,12 +38,14 @@ func main() {
         case "4":
             searchHistory()
         case "5":
-            clearHistory()
+            exportHistory()
         case "6":
+            clearHistory()
+        case "7":
             fmt.Println("Exiting program.")
             return
         default:
-            fmt.Println("Invalid choice. Please enter 1, 2, 3, 4, 5, or 6.")
+            fmt.Println("Invalid choice. Please enter 1, 2, 3, 4, 5, 6, or 7.")
         }
         fmt.Println("---------")
     }
@@ -169,6 +171,40 @@ func searchHistory() {
 
     if err := scanner.Err(); err != nil {
         log.Println("Error reading file:", err)
+    }
+}
+
+func exportHistory() {
+    fmt.Print("Enter the filename to export history to (e.g., 'export.txt'): ")
+    var exportFilename string
+    fmt.Scanln(&exportFilename)
+
+    sourceFile, err := os.Open("results.txt")
+    if err != nil {
+        log.Println("Error opening source file:", err)
+        return
+    }
+    defer sourceFile.Close()
+
+    destFile, err := os.Create(exportFilename)
+    if err != nil {
+        log.Println("Error creating destination file:", err)
+        return
+    }
+    defer destFile.Close()
+
+    scanner := bufio.NewScanner(sourceFile)
+    for scanner.Scan() {
+        if _, err := destFile.WriteString(scanner.Text() + "\n"); err != nil {
+            log.Println("Error writing to destination file:", err)
+            return
+        }
+    }
+
+    if err := scanner.Err(); err != nil {
+        log.Println("Error reading source file:", err)
+    } else {
+        fmt.Printf("History successfully exported to %s.\n", exportFilename)
     }
 }
 
