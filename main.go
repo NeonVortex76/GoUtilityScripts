@@ -25,7 +25,7 @@ func main() {
 
     for {
         var choice string
-        fmt.Print("Choose an option: (1) New operation (2) View history (3) View last 5 operations (4) Search history (5) Export history (6) Clear history (7) Exit: ")
+        fmt.Print("Choose an option: (1) New operation (2) View history (3) View last 5 operations (4) Search history (5) Export history (6) Import history (7) Clear history (8) Exit: ")
         fmt.Scanln(&choice)
 
         switch choice {
@@ -40,12 +40,14 @@ func main() {
         case "5":
             exportHistory()
         case "6":
-            clearHistory()
+            importHistory(file)
         case "7":
+            clearHistory()
+        case "8":
             fmt.Println("Exiting program.")
             return
         default:
-            fmt.Println("Invalid choice. Please enter 1, 2, 3, 4, 5, 6, or 7.")
+            fmt.Println("Invalid choice. Please enter 1, 2, 3, 4, 5, 6, 7, or 8.")
         }
         fmt.Println("---------")
     }
@@ -205,6 +207,33 @@ func exportHistory() {
         log.Println("Error reading source file:", err)
     } else {
         fmt.Printf("History successfully exported to %s.\n", exportFilename)
+    }
+}
+
+func importHistory(file *os.File) {
+    fmt.Print("Enter the filename to import history from (e.g., 'import.txt'): ")
+    var importFilename string
+    fmt.Scanln(&importFilename)
+
+    importFile, err := os.Open(importFilename)
+    if err != nil {
+        log.Println("Error opening import file:", err)
+        return
+    }
+    defer importFile.Close()
+
+    scanner := bufio.NewScanner(importFile)
+    for scanner.Scan() {
+        if _, err := file.WriteString(scanner.Text() + "\n"); err != nil {
+            log.Println("Error writing to results file:", err)
+            return
+        }
+    }
+
+    if err := scanner.Err(); err != nil {
+        log.Println("Error reading import file:", err)
+    } else {
+        fmt.Printf("History successfully imported from %s.\n", importFilename)
     }
 }
 
