@@ -25,7 +25,7 @@ func main() {
 
     for {
         var choice string
-        fmt.Print("Choose an option: (1) New operation (2) View history (3) View last 5 operations (4) Search history (5) Export history (6) Import history (7) Delete entry by index (8) Clear history (9) Exit: ")
+        fmt.Print("Choose an option: (1) New operation (2) View history (3) View last 5 operations (4) Search history (5) Export history (6) Import history (7) Delete entry by index (8) Count total operations (9) Clear history (10) Exit: ")
         fmt.Scanln(&choice)
 
         switch choice {
@@ -44,12 +44,14 @@ func main() {
         case "7":
             deleteEntryByIndex()
         case "8":
-            clearHistory()
+            countTotalOperations()
         case "9":
+            clearHistory()
+        case "10":
             fmt.Println("Exiting program.")
             return
         default:
-            fmt.Println("Invalid choice. Please enter 1, 2, 3, 4, 5, 6, 7, 8, or 9.")
+            fmt.Println("Invalid choice. Please enter 1, 2, 3, 4, 5, 6, 7, 8, 9, or 10.")
         }
         fmt.Println("---------")
     }
@@ -293,6 +295,27 @@ func deleteEntryByIndex() {
     }
 }
 
+func countTotalOperations() {
+    file, err := os.Open("results.txt")
+    if err != nil {
+        log.Println("Error opening file:", err)
+        return
+    }
+    defer file.Close()
+
+    scanner := bufio.NewScanner(file)
+    count := 0
+    for scanner.Scan() {
+        count++
+    }
+
+    fmt.Printf("Total number of operations: %d\n", count)
+
+    if err := scanner.Err(); err != nil {
+        log.Println("Error reading file:", err)
+    }
+}
+
 func clearHistory() {
     err := os.Truncate("results.txt", 0)
     if err != nil {
@@ -318,11 +341,12 @@ func divide(a, b int) (string, error) {
     if b == 0 {
         return "", fmt.Errorf("cannot divide by zero")
     }
-    return fmt.Sprintf("%d", a/b), nil
+    result := float64(a) / float64(b)
+    return fmt.Sprintf("%.2f", result), nil
 }
 
-func power(a, b int) float64 {
-    return math.Pow(float64(a), float64(b))
+func power(a, b int) int {
+    return int(math.Pow(float64(a), float64(b)))
 }
 
 func modulus(a, b int) int {
@@ -332,7 +356,7 @@ func modulus(a, b int) int {
 func parseInputWithOperation(input string) (int, int, string, error) {
     parts := strings.Fields(input)
     if len(parts) != 3 {
-        return 0, 0, "", fmt.Errorf("input must contain exactly three parts")
+        return 0, 0, "", fmt.Errorf("invalid input format")
     }
 
     a, err1 := strconv.Atoi(parts[0])
