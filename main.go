@@ -1,4 +1,4 @@
-func operationStats() {
+func sortHistory(order string) {
     file, err := os.Open("results.txt")
     if err != nil {
         log.Println("Error opening file:", err)
@@ -7,23 +7,10 @@ func operationStats() {
     defer file.Close()
 
     scanner := bufio.NewScanner(file)
-
-    stats := map[string]int{
-        "+": 0,
-        "-": 0,
-        "*": 0,
-        "/": 0,
-        "%": 0,
-        "^": 0,
-    }
+    lines := []string{}
 
     for scanner.Scan() {
-        line := scanner.Text()
-        for op := range stats {
-            if strings.Contains(line, " "+op+" ") {
-                stats[op]++
-            }
-        }
+        lines = append(lines, scanner.Text())
     }
 
     if err := scanner.Err(); err != nil {
@@ -31,8 +18,34 @@ func operationStats() {
         return
     }
 
-    fmt.Println("Operation Statistics:")
-    for op, count := range stats {
-        fmt.Printf("%s: %d\n", op, count)
+    sort.SliceStable(lines, func(i, j int) bool {
+        timeI := getTimeFromEntry(lines[i])
+        timeJ := getTimeFromEntry(lines[j])
+
+        if order == "asc" {
+            return timeI.Before(timeJ)
+        }
+        return timeI.After(timeJ)
+    })
+
+    fmt.Println("Sorted History:")
+    for _, line := range lines {
+        fmt.Println(line)
     }
+}
+
+func getTimeFromEntry(entry string) time.Time {
+    parts := strings.Split(entry, " - ")
+    if len(parts) < 1 {
+        return time.Time{}
+    }
+
+    timestamp := parts[0]
+    parsedTime, err := time.Parse(time.RFC3339, timestamp)
+    if err != nil {
+        log.Println("Error parsing time:", err)
+        return time.Time{}
+    }
+
+    return parsedTime
 }
