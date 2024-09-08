@@ -1,4 +1,4 @@
-func sortHistory(order string) {
+func filterHistoryByOperation(operation string) {
     file, err := os.Open("results.txt")
     if err != nil {
         log.Println("Error opening file:", err)
@@ -7,10 +7,13 @@ func sortHistory(order string) {
     defer file.Close()
 
     scanner := bufio.NewScanner(file)
-    lines := []string{}
+    filtered := []string{}
 
     for scanner.Scan() {
-        lines = append(lines, scanner.Text())
+        line := scanner.Text()
+        if strings.Contains(line, " "+operation+" ") {
+            filtered = append(filtered, line)
+        }
     }
 
     if err := scanner.Err(); err != nil {
@@ -18,34 +21,12 @@ func sortHistory(order string) {
         return
     }
 
-    sort.SliceStable(lines, func(i, j int) bool {
-        timeI := getTimeFromEntry(lines[i])
-        timeJ := getTimeFromEntry(lines[j])
-
-        if order == "asc" {
-            return timeI.Before(timeJ)
+    if len(filtered) == 0 {
+        fmt.Printf("No operations found for '%s'.\n", operation)
+    } else {
+        fmt.Printf("Filtered history for operation '%s':\n", operation)
+        for _, line := range filtered {
+            fmt.Println(line)
         }
-        return timeI.After(timeJ)
-    })
-
-    fmt.Println("Sorted History:")
-    for _, line := range lines {
-        fmt.Println(line)
     }
-}
-
-func getTimeFromEntry(entry string) time.Time {
-    parts := strings.Split(entry, " - ")
-    if len(parts) < 1 {
-        return time.Time{}
-    }
-
-    timestamp := parts[0]
-    parsedTime, err := time.Parse(time.RFC3339, timestamp)
-    if err != nil {
-        log.Println("Error parsing time:", err)
-        return time.Time{}
-    }
-
-    return parsedTime
 }
