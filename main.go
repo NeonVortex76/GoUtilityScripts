@@ -1,4 +1,4 @@
-func filterHistoryByOperation(operation string) {
+func averageResult() {
     file, err := os.Open("results.txt")
     if err != nil {
         log.Println("Error opening file:", err)
@@ -7,12 +7,15 @@ func filterHistoryByOperation(operation string) {
     defer file.Close()
 
     scanner := bufio.NewScanner(file)
-    filtered := []string{}
+    var total float64
+    var count int
 
     for scanner.Scan() {
         line := scanner.Text()
-        if strings.Contains(line, " "+operation+" ") {
-            filtered = append(filtered, line)
+        result, err := extractResultFromEntry(line)
+        if err == nil {
+            total += result
+            count++
         }
     }
 
@@ -21,12 +24,25 @@ func filterHistoryByOperation(operation string) {
         return
     }
 
-    if len(filtered) == 0 {
-        fmt.Printf("No operations found for '%s'.\n", operation)
-    } else {
-        fmt.Printf("Filtered history for operation '%s':\n", operation)
-        for _, line := range filtered {
-            fmt.Println(line)
-        }
+    if count == 0 {
+        fmt.Println("No numeric results found.")
+        return
     }
+
+    average := total / float64(count)
+    fmt.Printf("The average result of all operations is: %.2f\n", average)
+}
+
+func extractResultFromEntry(entry string) (float64, error) {
+    parts := strings.Split(entry, " = ")
+    if len(parts) < 2 {
+        return 0, fmt.Errorf("invalid entry format")
+    }
+
+    result, err := strconv.ParseFloat(parts[1], 64)
+    if err != nil {
+        return 0, fmt.Errorf("invalid result format")
+    }
+
+    return result, nil
 }
