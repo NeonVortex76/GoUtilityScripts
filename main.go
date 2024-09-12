@@ -1,31 +1,31 @@
-func backupHistory() {
-    srcFile, err := os.Open("results.txt")
+func restoreHistoryFromBackup() {
+    backupFile, err := os.Open("results_backup.txt")
     if err != nil {
-        log.Println("Error opening source file:", err)
-        return
-    }
-    defer srcFile.Close()
-
-    backupFile, err := os.Create("results_backup.txt")
-    if err != nil {
-        log.Println("Error creating backup file:", err)
+        log.Println("Error opening backup file:", err)
         return
     }
     defer backupFile.Close()
 
-    scanner := bufio.NewScanner(srcFile)
+    restoreFile, err := os.Create("results.txt")
+    if err != nil {
+        log.Println("Error creating results file:", err)
+        return
+    }
+    defer restoreFile.Close()
+
+    scanner := bufio.NewScanner(backupFile)
     for scanner.Scan() {
         line := scanner.Text()
-        if _, err := backupFile.WriteString(line + "\n"); err != nil {
-            log.Println("Error writing to backup file:", err)
+        if _, err := restoreFile.WriteString(line + "\n"); err != nil {
+            log.Println("Error writing to results file:", err)
             return
         }
     }
 
     if err := scanner.Err(); err != nil {
-        log.Println("Error reading source file:", err)
+        log.Println("Error reading backup file:", err)
         return
     }
 
-    fmt.Println("Backup created successfully.")
+    fmt.Println("History restored successfully from backup.")
 }
