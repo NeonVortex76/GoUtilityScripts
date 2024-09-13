@@ -1,31 +1,47 @@
-func restoreHistoryFromBackup() {
-    backupFile, err := os.Open("results_backup.txt")
+func validateHistory() {
+    file, err := os.Open("results.txt")
     if err != nil {
-        log.Println("Error opening backup file:", err)
+        log.Println("Error opening file:", err)
         return
     }
-    defer backupFile.Close()
+    defer file.Close()
 
-    restoreFile, err := os.Create("results.txt")
-    if err != nil {
-        log.Println("Error creating results file:", err)
-        return
-    }
-    defer restoreFile.Close()
+    scanner := bufio.NewScanner(file)
+    isValid := true
+    lineNumber := 0
 
-    scanner := bufio.NewScanner(backupFile)
     for scanner.Scan() {
         line := scanner.Text()
-        if _, err := restoreFile.WriteString(line + "\n"); err != nil {
-            log.Println("Error writing to results file:", err)
-            return
+        lineNumber++
+
+        if !isValidEntryFormat(line) {
+            fmt.Printf("Invalid format at line %d: %s\n", lineNumber, line)
+            isValid = false
         }
     }
 
     if err := scanner.Err(); err != nil {
-        log.Println("Error reading backup file:", err)
+        log.Println("Error reading file:", err)
         return
     }
 
-    fmt.Println("History restored successfully from backup.")
+    if isValid {
+        fmt.Println("All entries are valid.")
+    } else {
+        fmt.Println("Some entries have invalid format.")
+    }
+}
+
+func isValidEntryFormat(entry string) bool {
+    parts := strings.Split(entry, " = ")
+    if len(parts) != 2 {
+        return false
+    }
+
+    _, err := strconv.ParseFloat(parts[1], 64)
+    if err != nil {
+        return false
+    }
+
+    return true
 }
