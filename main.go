@@ -1,4 +1,4 @@
-func countOperationsByType() {
+func mostFrequentOperation() {
     file, err := os.Open("results.txt")
     if err != nil {
         log.Println("Error opening file:", err)
@@ -30,8 +30,18 @@ func countOperationsByType() {
         return
     }
 
-    fmt.Println("Operation counts:")
+    mostFrequent := ""
+    maxCount := 0
     for operation, count := range operationCount {
-        fmt.Printf("%s: %d\n", operation, count)
+        if count > maxCount {
+            mostFrequent = operation
+            maxCount = count
+        }
+    }
+
+    if mostFrequent != "" {
+        fmt.Printf("The most frequently used operation is '%s' with %d occurrences.\n", mostFrequent, maxCount)
+    } else {
+        fmt.Println("No operations found.")
     }
 }
