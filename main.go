@@ -1,4 +1,4 @@
-func filterByDateRange() {
+func countOperationsByDateRange() {
     layout := "2006-01-02"
     var startDateStr, endDateStr string
 
@@ -26,7 +26,7 @@ func filterByDateRange() {
     defer file.Close()
 
     scanner := bufio.NewScanner(file)
-    operationsFound := false
+    operationCount := 0
 
     for scanner.Scan() {
         line := scanner.Text()
@@ -37,8 +37,7 @@ func filterByDateRange() {
         }
 
         if operationDate.After(startDate) && operationDate.Before(endDate) || operationDate.Equal(startDate) || operationDate.Equal(endDate) {
-            fmt.Println(line)
-            operationsFound = true
+            operationCount++
         }
     }
 
@@ -46,7 +45,5 @@ func filterByDateRange() {
         log.Println("Error reading file:", err)
     }
 
-    if !operationsFound {
-        fmt.Println("No operations found in the specified date range.")
-    }
+    fmt.Printf("Total operations between %s and %s: %d\n", startDateStr, endDateStr, operationCount)
 }
