@@ -1,4 +1,4 @@
-func editEntryByIndex() {
+func operationDurationStats() {
     file, err := os.Open("results.txt")
     if err != nil {
         log.Println("Error opening file:", err)
@@ -6,26 +6,27 @@ func editEntryByIndex() {
     }
     defer file.Close()
 
-    var index int
-    fmt.Print("Enter the index of the entry to edit: ")
-    fmt.Scanln(&index)
+    operationDurations := make(map[string]time.Duration)
+    operationCounts := make(map[string]int)
 
     scanner := bufio.NewScanner(file)
-    lines := []string{}
-    lineNumber := 0
-
     for scanner.Scan() {
         line := scanner.Text()
-        if lineNumber == index {
-            fmt.Printf("Current entry at index %d: %s\n", index, line)
-            fmt.Print("Enter new entry: ")
-            var newEntry string
-            fmt.Scanln(&newEntry)
-            lines = append(lines, newEntry)
-        } else {
-            lines = append(lines, line)
+        parts := strings.Split(line, " ")
+        if len(parts) < 3 {
+            continue
         }
-        lineNumber++
+
+        operation := parts[1]
+        durationStr := parts[2]
+        duration, err := time.ParseDuration(durationStr)
+        if err != nil {
+            log.Println("Error parsing duration:", err)
+            continue
+        }
+
+        operationDurations[operation] += duration
+        operationCounts[operation]++
     }
 
     if err := scanner.Err(); err != nil {
@@ -33,6 +34,10 @@ func editEntryByIndex() {
         return
     }
 
-    saveFixedEntries(lines)
-    fmt.Printf("Entry at index %d has been updated.\n", index)
+    fmt.Println("Operation duration statistics:")
+    for operation, totalDuration := range operationDurations {
+        count := operationCounts[operation]
+        avgDuration := totalDuration / time.Duration(count)
+        fmt.Printf("%s: total time = %v, average time = %v (%d occurrences)\n", operation, totalDuration, avgDuration, count)
+    }
 }
