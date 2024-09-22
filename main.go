@@ -1,4 +1,4 @@
-func operationDurationStats() {
+func calculateMedianResult() {
     file, err := os.Open("results.txt")
     if err != nil {
         log.Println("Error opening file:", err)
@@ -6,10 +6,9 @@ func operationDurationStats() {
     }
     defer file.Close()
 
-    operationDurations := make(map[string]time.Duration)
-    operationCounts := make(map[string]int)
-
+    var results []float64
     scanner := bufio.NewScanner(file)
+
     for scanner.Scan() {
         line := scanner.Text()
         parts := strings.Split(line, " ")
@@ -17,16 +16,13 @@ func operationDurationStats() {
             continue
         }
 
-        operation := parts[1]
-        durationStr := parts[2]
-        duration, err := time.ParseDuration(durationStr)
+        result, err := strconv.ParseFloat(parts[2], 64) // Предполагаем, что результат операции — третья часть строки
         if err != nil {
-            log.Println("Error parsing duration:", err)
+            log.Println("Error parsing result:", err)
             continue
         }
 
-        operationDurations[operation] += duration
-        operationCounts[operation]++
+        results = append(results, result)
     }
 
     if err := scanner.Err(); err != nil {
@@ -34,10 +30,20 @@ func operationDurationStats() {
         return
     }
 
-    fmt.Println("Operation duration statistics:")
-    for operation, totalDuration := range operationDurations {
-        count := operationCounts[operation]
-        avgDuration := totalDuration / time.Duration(count)
-        fmt.Printf("%s: total time = %v, average time = %v (%d occurrences)\n", operation, totalDuration, avgDuration, count)
+    if len(results) == 0 {
+        fmt.Println("No results found.")
+        return
     }
+
+    sort.Float64s(results)
+
+    var median float64
+    n := len(results)
+    if n%2 == 0 {
+        median = (results[n/2-1] + results[n/2]) / 2
+    } else {
+        median = results[n/2]
+    }
+
+    fmt.Printf("The median result is: %.2f\n", median)
 }
