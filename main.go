@@ -1,4 +1,4 @@
-func calculateMedianResult() {
+func findLongestOperation() {
     file, err := os.Open("results.txt")
     if err != nil {
         log.Println("Error opening file:", err)
@@ -6,9 +6,10 @@ func calculateMedianResult() {
     }
     defer file.Close()
 
-    var results []float64
-    scanner := bufio.NewScanner(file)
+    longestDuration := time.Duration(0)
+    longestOperation := ""
 
+    scanner := bufio.NewScanner(file)
     for scanner.Scan() {
         line := scanner.Text()
         parts := strings.Split(line, " ")
@@ -16,13 +17,18 @@ func calculateMedianResult() {
             continue
         }
 
-        result, err := strconv.ParseFloat(parts[2], 64) // Предполагаем, что результат операции — третья часть строки
+        operation := parts[1]
+        durationStr := parts[2]
+        duration, err := time.ParseDuration(durationStr)
         if err != nil {
-            log.Println("Error parsing result:", err)
+            log.Println("Error parsing duration:", err)
             continue
         }
 
-        results = append(results, result)
+        if duration > longestDuration {
+            longestDuration = duration
+            longestOperation = line
+        }
     }
 
     if err := scanner.Err(); err != nil {
@@ -30,20 +36,9 @@ func calculateMedianResult() {
         return
     }
 
-    if len(results) == 0 {
-        fmt.Println("No results found.")
-        return
-    }
-
-    sort.Float64s(results)
-
-    var median float64
-    n := len(results)
-    if n%2 == 0 {
-        median = (results[n/2-1] + results[n/2]) / 2
+    if longestOperation != "" {
+        fmt.Printf("The longest operation is: %s (duration: %v)\n", longestOperation, longestDuration)
     } else {
-        median = results[n/2]
+        fmt.Println("No operations found.")
     }
-
-    fmt.Printf("The median result is: %.2f\n", median)
 }
