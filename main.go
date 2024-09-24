@@ -1,4 +1,4 @@
-func findLongestOperation() {
+func findShortestOperation() {
     file, err := os.Open("results.txt")
     if err != nil {
         log.Println("Error opening file:", err)
@@ -6,8 +6,8 @@ func findLongestOperation() {
     }
     defer file.Close()
 
-    longestDuration := time.Duration(0)
-    longestOperation := ""
+    shortestDuration := time.Duration(math.MaxInt64)
+    shortestOperation := ""
 
     scanner := bufio.NewScanner(file)
     for scanner.Scan() {
@@ -25,9 +25,9 @@ func findLongestOperation() {
             continue
         }
 
-        if duration > longestDuration {
-            longestDuration = duration
-            longestOperation = line
+        if duration < shortestDuration {
+            shortestDuration = duration
+            shortestOperation = line
         }
     }
 
@@ -36,8 +36,8 @@ func findLongestOperation() {
         return
     }
 
-    if longestOperation != "" {
-        fmt.Printf("The longest operation is: %s (duration: %v)\n", longestOperation, longestDuration)
+    if shortestOperation != "" {
+        fmt.Printf("The shortest operation is: %s (duration: %v)\n", shortestOperation, shortestDuration)
     } else {
         fmt.Println("No operations found.")
     }
