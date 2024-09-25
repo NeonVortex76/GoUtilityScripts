@@ -1,4 +1,4 @@
-func findShortestOperation() {
+func sortOperationsByDuration() {
     file, err := os.Open("results.txt")
     if err != nil {
         log.Println("Error opening file:", err)
@@ -6,10 +6,14 @@ func findShortestOperation() {
     }
     defer file.Close()
 
-    shortestDuration := time.Duration(math.MaxInt64)
-    shortestOperation := ""
+    type operationEntry struct {
+        line     string
+        duration time.Duration
+    }
 
+    var operations []operationEntry
     scanner := bufio.NewScanner(file)
+
     for scanner.Scan() {
         line := scanner.Text()
         parts := strings.Split(line, " ")
@@ -17,7 +21,6 @@ func findShortestOperation() {
             continue
         }
 
-        operation := parts[1]
         durationStr := parts[2]
         duration, err := time.ParseDuration(durationStr)
         if err != nil {
@@ -25,10 +28,7 @@ func findShortestOperation() {
             continue
         }
 
-        if duration < shortestDuration {
-            shortestDuration = duration
-            shortestOperation = line
-        }
+        operations = append(operations, operationEntry{line: line, duration: duration})
     }
 
     if err := scanner.Err(); err != nil {
@@ -36,9 +36,12 @@ func findShortestOperation() {
         return
     }
 
-    if shortestOperation != "" {
-        fmt.Printf("The shortest operation is: %s (duration: %v)\n", shortestOperation, shortestDuration)
-    } else {
-        fmt.Println("No operations found.")
+    sort.Slice(operations, func(i, j int) bool {
+        return operations[i].duration < operations[j].duration
+    })
+
+    fmt.Println("Operations sorted by duration:")
+    for _, op := range operations {
+        fmt.Println(op.line)
     }
 }
