@@ -1,4 +1,4 @@
-func sortOperationsByDuration() {
+func filterOperationsByDurationRange() {
     file, err := os.Open("results.txt")
     if err != nil {
         log.Println("Error opening file:", err)
@@ -6,13 +6,26 @@ func sortOperationsByDuration() {
     }
     defer file.Close()
 
-    type operationEntry struct {
-        line     string
-        duration time.Duration
+    var minDurationStr, maxDurationStr string
+    fmt.Print("Enter minimum duration (e.g., 2s): ")
+    fmt.Scanln(&minDurationStr)
+    fmt.Print("Enter maximum duration (e.g., 5s): ")
+    fmt.Scanln(&maxDurationStr)
+
+    minDuration, err := time.ParseDuration(minDurationStr)
+    if err != nil {
+        log.Println("Error parsing minimum duration:", err)
+        return
     }
 
-    var operations []operationEntry
+    maxDuration, err := time.ParseDuration(maxDurationStr)
+    if err != nil {
+        log.Println("Error parsing maximum duration:", err)
+        return
+    }
+
     scanner := bufio.NewScanner(file)
+    fmt.Printf("Operations with duration between %v and %v:\n", minDuration, maxDuration)
 
     for scanner.Scan() {
         line := scanner.Text()
@@ -28,20 +41,12 @@ func sortOperationsByDuration() {
             continue
         }
 
-        operations = append(operations, operationEntry{line: line, duration: duration})
+        if duration >= minDuration && duration <= maxDuration {
+            fmt.Println(line)
+        }
     }
 
     if err := scanner.Err(); err != nil {
         log.Println("Error reading file:", err)
-        return
-    }
-
-    sort.Slice(operations, func(i, j int) bool {
-        return operations[i].duration < operations[j].duration
-    })
-
-    fmt.Println("Operations sorted by duration:")
-    for _, op := range operations {
-        fmt.Println(op.line)
     }
 }
