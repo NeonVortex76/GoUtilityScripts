@@ -1,4 +1,4 @@
-func deleteOperationsByKeyword() {
+func countOperationsByKeyword() {
     file, err := os.Open("results.txt")
     if err != nil {
         log.Println("Error opening file:", err)
@@ -7,16 +7,16 @@ func deleteOperationsByKeyword() {
     defer file.Close()
 
     var keyword string
-    fmt.Print("Enter the keyword to delete operations: ")
+    fmt.Print("Enter the keyword to count operations: ")
     fmt.Scanln(&keyword)
 
-    var updatedLines []string
     scanner := bufio.NewScanner(file)
+    count := 0
 
     for scanner.Scan() {
         line := scanner.Text()
-        if !strings.Contains(line, keyword) {
-            updatedLines = append(updatedLines, line)
+        if strings.Contains(line, keyword) {
+            count++
         }
     }
 
@@ -25,27 +25,5 @@ func deleteOperationsByKeyword() {
         return
     }
 
-    file.Close()
-
-    newFile, err := os.Create("results.txt")
-    if err != nil {
-        log.Println("Error creating file:", err)
-        return
-    }
-    defer newFile.Close()
-
-    writer := bufio.NewWriter(newFile)
-    for _, line := range updatedLines {
-        _, err := writer.WriteString(line + "\n")
-        if err != nil {
-            log.Println("Error writing to file:", err)
-            return
-        }
-    }
-
-    if err := writer.Flush(); err != nil {
-        log.Println("Error flushing data to file:", err)
-    }
-
-    fmt.Println("Operations containing the keyword have been deleted.")
+    fmt.Printf("Total operations containing the keyword '%s': %d\n", keyword, count)
 }
