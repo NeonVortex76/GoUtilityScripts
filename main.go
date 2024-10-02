@@ -1,4 +1,4 @@
-func countOperationsByKeyword() {
+func removeDuplicateOperations() {
     file, err := os.Open("results.txt")
     if err != nil {
         log.Println("Error opening file:", err)
@@ -6,17 +6,15 @@ func countOperationsByKeyword() {
     }
     defer file.Close()
 
-    var keyword string
-    fmt.Print("Enter the keyword to count operations: ")
-    fmt.Scanln(&keyword)
-
     scanner := bufio.NewScanner(file)
-    count := 0
+    uniqueLines := make(map[string]bool)
+    var updatedLines []string
 
     for scanner.Scan() {
         line := scanner.Text()
-        if strings.Contains(line, keyword) {
-            count++
+        if _, exists := uniqueLines[line]; !exists {
+            uniqueLines[line] = true
+            updatedLines = append(updatedLines, line)
         }
     }
 
@@ -25,5 +23,27 @@ func countOperationsByKeyword() {
         return
     }
 
-    fmt.Printf("Total operations containing the keyword '%s': %d\n", keyword, count)
+    file.Close()
+
+    newFile, err := os.Create("results.txt")
+    if err != nil {
+        log.Println("Error creating file:", err)
+        return
+    }
+    defer newFile.Close()
+
+    writer := bufio.NewWriter(newFile)
+    for _, line := range updatedLines {
+        _, err := writer.WriteString(line + "\n")
+        if err != nil {
+            log.Println("Error writing to file:", err)
+            return
+        }
+    }
+
+    if err := writer.Flush(); err != nil {
+        log.Println("Error flushing data to file:", err)
+    }
+
+    fmt.Println("Duplicate operations have been removed.")
 }
