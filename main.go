@@ -22,4 +22,16 @@ func filterOperationsByResultThreshold() {
 
         result, err := strconv.ParseFloat(parts[1], 64)
         if err != nil {
-            log.Println("Error
+            log.Println("Error parsing result:", err)
+            continue
+        }
+
+        if result > threshold {
+            fmt.Println(line)
+        }
+    }
+
+    if err := scanner.Err(); err != nil {
+        log.Println("Error reading file:", err)
+    }
+}
