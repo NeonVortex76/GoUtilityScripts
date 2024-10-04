@@ -1,4 +1,4 @@
-func filterOperationsByDate() {
+func filterOperationsByResultThreshold() {
     file, err := os.Open("results.txt")
     if err != nil {
         log.Println("Error opening file:", err)
@@ -6,21 +6,20 @@ func filterOperationsByDate() {
     }
     defer file.Close()
 
-    var dateInput string
-    fmt.Print("Enter the date (YYYY-MM-DD) to filter operations: ")
-    fmt.Scanln(&dateInput)
+    var threshold float64
+    fmt.Print("Enter the result threshold to filter operations: ")
+    fmt.Scanln(&threshold)
 
     scanner := bufio.NewScanner(file)
-    fmt.Printf("Operations on %s:\n", dateInput)
+    fmt.Printf("Operations with results greater than %.2f:\n", threshold)
 
     for scanner.Scan() {
         line := scanner.Text()
-        if strings.Contains(line, dateInput) {
-            fmt.Println(line)
+        parts := strings.Split(line, " ")
+        if len(parts) < 2 {
+            continue
         }
-    }
 
-    if err := scanner.Err(); err != nil {
-        log.Println("Error reading file:", err)
-    }
-}
+        result, err := strconv.ParseFloat(parts[1], 64)
+        if err != nil {
+            log.Println("Error
