@@ -1,37 +1,38 @@
-func filterOperationsByResultThreshold() {
-    file, err := os.Open("results.txt")
+func exportToCSV() {
+    inputFile, err := os.Open("results.txt")
     if err != nil {
         log.Println("Error opening file:", err)
         return
     }
-    defer file.Close()
+    defer inputFile.Close()
 
-    var threshold float64
-    fmt.Print("Enter the result threshold to filter operations: ")
-    fmt.Scanln(&threshold)
+    outputFile, err := os.Create("export.csv")
+    if err != nil {
+        log.Println("Error creating CSV file:", err)
+        return
+    }
+    defer outputFile.Close()
 
-    scanner := bufio.NewScanner(file)
-    fmt.Printf("Operations with results greater than %.2f:\n", threshold)
+    writer := csv.NewWriter(outputFile)
+    defer writer.Flush()
+
+    scanner := bufio.NewScanner(inputFile)
 
     for scanner.Scan() {
         line := scanner.Text()
         parts := strings.Split(line, " ")
-        if len(parts) < 2 {
-            continue
-        }
-
-        result, err := strconv.ParseFloat(parts[1], 64)
-        if err != nil {
-            log.Println("Error parsing result:", err)
-            continue
-        }
-
-        if result > threshold {
-            fmt.Println(line)
+        if len(parts) > 1 {
+            err := writer.Write(parts)
+            if err != nil {
+                log.Println("Error writing to CSV:", err)
+                return
+            }
         }
     }
 
     if err := scanner.Err(); err != nil {
         log.Println("Error reading file:", err)
     }
+
+    fmt.Println("History exported to export.csv.")
 }
