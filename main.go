@@ -1,38 +1,43 @@
-func exportToCSV() {
-    inputFile, err := os.Open("results.txt")
+func importFromCSV() {
+    inputFile, err := os.Open("import.csv")
     if err != nil {
-        log.Println("Error opening file:", err)
+        log.Println("Error opening CSV file:", err)
         return
     }
     defer inputFile.Close()
 
-    outputFile, err := os.Create("export.csv")
+    outputFile, err := os.OpenFile("results.txt", os.O_APPEND|os.O_WRONLY, 0644)
     if err != nil {
-        log.Println("Error creating CSV file:", err)
+        log.Println("Error opening results file:", err)
         return
     }
     defer outputFile.Close()
 
-    writer := csv.NewWriter(outputFile)
-    defer writer.Flush()
+    reader := csv.NewReader(inputFile)
+    writer := bufio.NewWriter(outputFile)
 
-    scanner := bufio.NewScanner(inputFile)
+    for {
+        record, err := reader.Read()
+        if err == io.EOF {
+            break
+        }
+        if err != nil {
+            log.Println("Error reading CSV:", err)
+            return
+        }
 
-    for scanner.Scan() {
-        line := scanner.Text()
-        parts := strings.Split(line, " ")
-        if len(parts) > 1 {
-            err := writer.Write(parts)
-            if err != nil {
-                log.Println("Error writing to CSV:", err)
-                return
-            }
+        line := strings.Join(record, " ") + "\n"
+        _, err = writer.WriteString(line)
+        if err != nil {
+            log.Println("Error writing to results file:", err)
+            return
         }
     }
 
-    if err := scanner.Err(); err != nil {
-        log.Println("Error reading file:", err)
+    err = writer.Flush()
+    if err != nil {
+        log.Println("Error flushing data to file:", err)
     }
 
-    fmt.Println("History exported to export.csv.")
+    fmt.Println("Operations imported from import.csv.")
 }
