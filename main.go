@@ -1,43 +1,53 @@
-func importFromCSV() {
-    inputFile, err := os.Open("import.csv")
+func deleteOperationsBelowThreshold() {
+    inputFile, err := os.Open("results.txt")
     if err != nil {
-        log.Println("Error opening CSV file:", err)
+        log.Println("Error opening file:", err)
         return
     }
     defer inputFile.Close()
 
-    outputFile, err := os.OpenFile("results.txt", os.O_APPEND|os.O_WRONLY, 0644)
+    var threshold float64
+    fmt.Print("Enter the result threshold: ")
+    fmt.Scanln(&threshold)
+
+    tempFile, err := os.Create("temp_results.txt")
     if err != nil {
-        log.Println("Error opening results file:", err)
+        log.Println("Error creating temp file:", err)
         return
     }
-    defer outputFile.Close()
+    defer tempFile.Close()
 
-    reader := csv.NewReader(inputFile)
-    writer := bufio.NewWriter(outputFile)
+    scanner := bufio.NewScanner(inputFile)
+    writer := bufio.NewWriter(tempFile)
 
-    for {
-        record, err := reader.Read()
-        if err == io.EOF {
-            break
-        }
-        if err != nil {
-            log.Println("Error reading CSV:", err)
-            return
+    for scanner.Scan() {
+        line := scanner.Text()
+        parts := strings.Split(line, " ")
+        if len(parts) < 2 {
+            continue
         }
 
-        line := strings.Join(record, " ") + "\n"
-        _, err = writer.WriteString(line)
+        result, err := strconv.ParseFloat(parts[1], 64)
         if err != nil {
-            log.Println("Error writing to results file:", err)
-            return
+            log.Println("Error parsing result:", err)
+            continue
+        }
+
+        if result >= threshold {
+            _, err := writer.WriteString(line + "\n")
+            if err != nil {
+                log.Println("Error writing to temp file:", err)
+            }
         }
     }
 
     err = writer.Flush()
     if err != nil {
-        log.Println("Error flushing data to file:", err)
+        log.Println("Error flushing to temp file:", err)
     }
 
-    fmt.Println("Operations imported from import.csv.")
+    os.Remove("results.txt")
+    os.Rename("temp_results.txt", "results.txt")
+
+    fmt.Printf("Operations with result below %.2f were deleted.\n", threshold)
 }
