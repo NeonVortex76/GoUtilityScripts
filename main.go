@@ -1,4 +1,4 @@
-func deleteOperationsBelowThreshold() {
+func deleteOperationsByKeyword() {
     inputFile, err := os.Open("results.txt")
     if err != nil {
         log.Println("Error opening file:", err)
@@ -6,9 +6,9 @@ func deleteOperationsBelowThreshold() {
     }
     defer inputFile.Close()
 
-    var threshold float64
-    fmt.Print("Enter the result threshold: ")
-    fmt.Scanln(&threshold)
+    var keyword string
+    fmt.Print("Enter the keyword to delete operations: ")
+    fmt.Scanln(&keyword)
 
     tempFile, err := os.Create("temp_results.txt")
     if err != nil {
@@ -22,18 +22,7 @@ func deleteOperationsBelowThreshold() {
 
     for scanner.Scan() {
         line := scanner.Text()
-        parts := strings.Split(line, " ")
-        if len(parts) < 2 {
-            continue
-        }
-
-        result, err := strconv.ParseFloat(parts[1], 64)
-        if err != nil {
-            log.Println("Error parsing result:", err)
-            continue
-        }
-
-        if result >= threshold {
+        if !strings.Contains(line, keyword) {
             _, err := writer.WriteString(line + "\n")
             if err != nil {
                 log.Println("Error writing to temp file:", err)
@@ -49,5 +38,5 @@ func deleteOperationsBelowThreshold() {
     os.Remove("results.txt")
     os.Rename("temp_results.txt", "results.txt")
 
-    fmt.Printf("Operations with result below %.2f were deleted.\n", threshold)
+    fmt.Printf("Operations containing the keyword '%s' were deleted.\n", keyword)
 }
