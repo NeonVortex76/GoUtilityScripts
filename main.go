@@ -1,4 +1,4 @@
-func filterOperationsByDateRange() {
+func deleteOperationsBelowThreshold() {
     inputFile, err := os.Open("results.txt")
     if err != nil {
         log.Println("Error opening file:", err)
@@ -6,42 +6,41 @@ func filterOperationsByDateRange() {
     }
     defer inputFile.Close()
 
-    var startDateStr, endDateStr string
-    fmt.Print("Enter the start date (YYYY-MM-DD): ")
-    fmt.Scanln(&startDateStr)
-    fmt.Print("Enter the end date (YYYY-MM-DD): ")
-    fmt.Scanln(&endDateStr)
+    var threshold float64
+    fmt.Print("Enter the result threshold: ")
+    fmt.Scanln(&threshold)
 
-    layout := "2006-01-02"
-    startDate, err := time.Parse(layout, startDateStr)
+    tempFile, err := os.Create("temp_results.txt")
     if err != nil {
-        log.Println("Invalid start date:", err)
+        log.Println("Error creating temp file:", err)
         return
     }
-    endDate, err := time.Parse(layout, endDateStr)
-    if err != nil {
-        log.Println("Invalid end date:", err)
-        return
-    }
+    defer tempFile.Close()
 
     scanner := bufio.NewScanner(inputFile)
-    fmt.Printf("Operations between %s and %s:\n", startDateStr, endDateStr)
+    writer := bufio.NewWriter(tempFile)
 
     for scanner.Scan() {
         line := scanner.Text()
-        dateStr := strings.Split(line, " ")[0]
-        operationDate, err := time.Parse(layout, dateStr)
-        if err != nil {
-            log.Println("Error parsing date:", err)
-            continue
-        }
-
-        if operationDate.After(startDate) && operationDate.Before(endDate) || operationDate.Equal(startDate) || operationDate.Equal(endDate) {
-            fmt.Println(line)
+        parts := strings.Split(line, " ")
+        if len(parts) > 1 {
+            result, err := strconv.ParseFloat(parts[len(parts)-1], 64)
+            if err == nil && result >= threshold {
+                _, err := writer.WriteString(line + "\n")
+                if err != nil {
+                    log.Println("Error writing to temp file:", err)
+                }
+            }
         }
     }
 
-    if err := scanner.Err(); err != nil {
-        log.Println("Error reading file:", err)
+    err = writer.Flush()
+    if err != nil {
+        log.Println("Error flushing to temp file:", err)
     }
+
+    os.Remove("results.txt")
+    os.Rename("temp_results.txt", "results.txt")
+
+    fmt.Printf("Operations with result below %.2f were deleted.\n", threshold)
 }
