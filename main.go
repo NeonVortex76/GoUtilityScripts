@@ -1,4 +1,4 @@
-func filterOperationsByKeyword() {
+func countOperationsByKeyword() {
     inputFile, err := os.Open("results.txt")
     if err != nil {
         log.Println("Error opening file:", err)
@@ -7,20 +7,22 @@ func filterOperationsByKeyword() {
     defer inputFile.Close()
 
     var keyword string
-    fmt.Print("Enter the keyword to filter by: ")
+    fmt.Print("Enter the keyword to count operations by: ")
     fmt.Scanln(&keyword)
 
     scanner := bufio.NewScanner(inputFile)
-    fmt.Printf("Operations containing '%s':\n", keyword)
+    count := 0
 
     for scanner.Scan() {
         line := scanner.Text()
         if strings.Contains(line, keyword) {
-            fmt.Println(line)
+            count++
         }
     }
 
     if err := scanner.Err(); err != nil {
         log.Println("Error reading file:", err)
     }
+
+    fmt.Printf("Total operations containing '%s': %d\n", keyword, count)
 }
