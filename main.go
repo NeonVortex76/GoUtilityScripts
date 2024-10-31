@@ -1,4 +1,4 @@
-func countUniqueKeywords() {
+func findMostFrequentKeyword() {
     inputFile, err := os.Open("results.txt")
     if err != nil {
         log.Println("Error opening file:", err)
@@ -22,8 +22,14 @@ func countUniqueKeywords() {
         return
     }
 
-    fmt.Println("Unique keyword counts:")
+    var mostFrequentKeyword string
+    maxCount := 0
     for keyword, count := range keywordCount {
-        fmt.Printf("%s: %d\n", keyword, count)
+        if count > maxCount {
+            mostFrequentKeyword = keyword
+            maxCount = count
+        }
     }
+
+    fmt.Printf("Most frequent keyword: %s (Count: %d)\n", mostFrequentKeyword, maxCount)
 }
