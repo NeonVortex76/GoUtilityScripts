@@ -1,4 +1,4 @@
-func findMostFrequentKeyword() {
+func countOperationsContainingKeyword() {
     inputFile, err := os.Open("results.txt")
     if err != nil {
         log.Println("Error opening file:", err)
@@ -6,30 +6,23 @@ func findMostFrequentKeyword() {
     }
     defer inputFile.Close()
 
-    keywordCount := make(map[string]int)
+    var keyword string
+    fmt.Print("Enter the keyword to search for: ")
+    fmt.Scanln(&keyword)
+
     scanner := bufio.NewScanner(inputFile)
+    count := 0
 
     for scanner.Scan() {
         line := scanner.Text()
-        words := strings.Fields(line)
-        for _, word := range words {
-            keywordCount[word]++
+        if strings.Contains(line, keyword) {
+            count++
         }
     }
 
     if err := scanner.Err(); err != nil {
         log.Println("Error reading file:", err)
-        return
     }
 
-    var mostFrequentKeyword string
-    maxCount := 0
-    for keyword, count := range keywordCount {
-        if count > maxCount {
-            mostFrequentKeyword = keyword
-            maxCount = count
-        }
-    }
-
-    fmt.Printf("Most frequent keyword: %s (Count: %d)\n", mostFrequentKeyword, maxCount)
+    fmt.Printf("Number of operations containing '%s': %d\n", keyword, count)
 }
