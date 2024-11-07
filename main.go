@@ -1,4 +1,4 @@
-func calculateAverageDuration() {
+func findOperationsWithinDurationRange() {
     inputFile, err := os.Open("results.txt")
     if err != nil {
         log.Println("Error opening file:", err)
@@ -6,30 +6,27 @@ func calculateAverageDuration() {
     }
     defer inputFile.Close()
 
-    var totalDuration float64
-    var count int
+    var minDuration, maxDuration float64
+    fmt.Print("Enter minimum duration: ")
+    fmt.Scanln(&minDuration)
+    fmt.Print("Enter maximum duration: ")
+    fmt.Scanln(&maxDuration)
+
     scanner := bufio.NewScanner(inputFile)
 
+    fmt.Printf("Operations with duration between %.2f and %.2f:\n", minDuration, maxDuration)
     for scanner.Scan() {
         line := scanner.Text()
         parts := strings.Split(line, " ")
         if len(parts) > 2 {
             duration, err := strconv.ParseFloat(parts[len(parts)-2], 64)
-            if err == nil {
-                totalDuration += duration
-                count++
+            if err == nil && duration >= minDuration && duration <= maxDuration {
+                fmt.Println(line)
             }
         }
     }
 
     if err := scanner.Err(); err != nil {
         log.Println("Error reading file:", err)
-    }
-
-    if count > 0 {
-        avgDuration := totalDuration / float64(count)
-        fmt.Printf("Average operation duration: %.2f\n", avgDuration)
-    } else {
-        fmt.Println("No valid operations found for calculating average duration.")
     }
 }
