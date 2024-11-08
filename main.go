@@ -1,4 +1,4 @@
-func findOperationsWithinDurationRange() {
+func findKeywordFrequencyAcrossLines() {
     inputFile, err := os.Open("results.txt")
     if err != nil {
         log.Println("Error opening file:", err)
@@ -6,27 +6,26 @@ func findOperationsWithinDurationRange() {
     }
     defer inputFile.Close()
 
-    var minDuration, maxDuration float64
-    fmt.Print("Enter minimum duration: ")
-    fmt.Scanln(&minDuration)
-    fmt.Print("Enter maximum duration: ")
-    fmt.Scanln(&maxDuration)
+    var keyword string
+    fmt.Print("Enter the keyword to analyze frequency across lines: ")
+    fmt.Scanln(&keyword)
 
     scanner := bufio.NewScanner(inputFile)
+    lineCount := 0
+    occurrenceCount := 0
 
-    fmt.Printf("Operations with duration between %.2f and %.2f:\n", minDuration, maxDuration)
     for scanner.Scan() {
         line := scanner.Text()
-        parts := strings.Split(line, " ")
-        if len(parts) > 2 {
-            duration, err := strconv.ParseFloat(parts[len(parts)-2], 64)
-            if err == nil && duration >= minDuration && duration <= maxDuration {
-                fmt.Println(line)
-            }
+        if strings.Contains(line, keyword) {
+            occurrenceCount++
         }
+        lineCount++
     }
 
     if err := scanner.Err(); err != nil {
         log.Println("Error reading file:", err)
     }
+
+    frequency := float64(occurrenceCount) / float64(lineCount) * 100
+    fmt.Printf("Frequency of keyword '%s' across lines: %.2f%%\n", keyword, frequency)
 }
