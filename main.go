@@ -1,4 +1,4 @@
-func longestOperationLine() {
+func reverseOperationLines() {
     inputFile, err := os.Open("results.txt")
     if err != nil {
         log.Println("Error opening file:", err)
@@ -6,22 +6,19 @@ func longestOperationLine() {
     }
     defer inputFile.Close()
 
+    var lines []string
     scanner := bufio.NewScanner(inputFile)
-    longestLine := ""
-    maxLength := 0
 
     for scanner.Scan() {
-        line := scanner.Text()
-        length := len(line)
-        if length > maxLength {
-            maxLength = length
-            longestLine = line
-        }
+        lines = append(lines, scanner.Text())
     }
 
     if err := scanner.Err(); err != nil {
         log.Println("Error reading file:", err)
     }
 
-    fmt.Printf("Longest operation line (%d characters): %s\n", maxLength, longestLine)
+    fmt.Println("Reversed operation lines:")
+    for i := len(lines) - 1; i >= 0; i-- {
+        fmt.Println(lines[i])
+    }
 }
