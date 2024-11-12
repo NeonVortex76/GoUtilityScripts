@@ -1,4 +1,4 @@
-func filterOperationsByKeyword() {
+func countLinesWithSpecificWord() {
     inputFile, err := os.Open("results.txt")
     if err != nil {
         log.Println("Error opening file:", err)
@@ -6,21 +6,27 @@ func filterOperationsByKeyword() {
     }
     defer inputFile.Close()
 
-    var keyword string
-    fmt.Print("Enter the keyword to filter operations: ")
-    fmt.Scanln(&keyword)
+    var word string
+    fmt.Print("Enter the word to count its presence in lines: ")
+    fmt.Scanln(&word)
 
     scanner := bufio.NewScanner(inputFile)
+    lineCount := 0
 
-    fmt.Printf("Operations containing '%s':\n", keyword)
     for scanner.Scan() {
         line := scanner.Text()
-        if strings.Contains(line, keyword) {
-            fmt.Println(line)
+        words := strings.Fields(line)
+        for _, w := range words {
+            if w == word {
+                lineCount++
+                break
+            }
         }
     }
 
     if err := scanner.Err(); err != nil {
         log.Println("Error reading file:", err)
     }
+
+    fmt.Printf("Number of lines containing the word '%s': %d\n", word, lineCount)
 }
