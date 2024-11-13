@@ -1,4 +1,4 @@
-func countLinesWithSpecificWord() {
+func duplicateLineChecker() {
     inputFile, err := os.Open("results.txt")
     if err != nil {
         log.Println("Error opening file:", err)
@@ -6,21 +6,16 @@ func countLinesWithSpecificWord() {
     }
     defer inputFile.Close()
 
-    var word string
-    fmt.Print("Enter the word to count its presence in lines: ")
-    fmt.Scanln(&word)
-
     scanner := bufio.NewScanner(inputFile)
-    lineCount := 0
+    lineSet := make(map[string]bool)
+    duplicates := make([]string, 0)
 
     for scanner.Scan() {
         line := scanner.Text()
-        words := strings.Fields(line)
-        for _, w := range words {
-            if w == word {
-                lineCount++
-                break
-            }
+        if lineSet[line] {
+            duplicates = append(duplicates, line)
+        } else {
+            lineSet[line] = true
         }
     }
 
@@ -28,5 +23,12 @@ func countLinesWithSpecificWord() {
         log.Println("Error reading file:", err)
     }
 
-    fmt.Printf("Number of lines containing the word '%s': %d\n", word, lineCount)
+    if len(duplicates) > 0 {
+        fmt.Println("Duplicate lines found:")
+        for _, dup := range duplicates {
+            fmt.Println(dup)
+        }
+    } else {
+        fmt.Println("No duplicate lines found.")
+    }
 }
