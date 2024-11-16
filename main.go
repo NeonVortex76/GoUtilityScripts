@@ -1,4 +1,4 @@
-func deleteShortLines() {
+func findMostFrequentWord() {
     inputFile, err := os.Open("results.txt")
     if err != nil {
         log.Println("Error opening file:", err)
@@ -6,26 +6,14 @@ func deleteShortLines() {
     }
     defer inputFile.Close()
 
-    tempFile, err := os.Create("results_temp.txt")
-    if err != nil {
-        log.Println("Error creating temporary file:", err)
-        return
-    }
-    defer tempFile.Close()
-
-    var minLength int
-    fmt.Print("Enter the minimum line length to keep: ")
-    fmt.Scanln(&minLength)
-
+    wordCounts := make(map[string]int)
     scanner := bufio.NewScanner(inputFile)
 
     for scanner.Scan() {
         line := scanner.Text()
-        if len(line) >= minLength {
-            _, err := tempFile.WriteString(line + "\n")
-            if err != nil {
-                log.Println("Error writing to temporary file:", err)
-            }
+        words := strings.Fields(line)
+        for _, word := range words {
+            wordCounts[word]++
         }
     }
 
@@ -33,10 +21,19 @@ func deleteShortLines() {
         log.Println("Error reading file:", err)
     }
 
-    err = os.Rename("results_temp.txt", "results.txt")
-    if err != nil {
-        log.Println("Error replacing original file:", err)
+    mostFrequentWord := ""
+    highestCount := 0
+
+    for word, count := range wordCounts {
+        if count > highestCount {
+            mostFrequentWord = word
+            highestCount = count
+        }
     }
 
-    fmt.Println("Short lines deleted successfully.")
+    if mostFrequentWord != "" {
+        fmt.Printf("The most frequent word is '%s', appearing %d times.\n", mostFrequentWord, highestCount)
+    } else {
+        fmt.Println("No words found in the file.")
+    }
 }
