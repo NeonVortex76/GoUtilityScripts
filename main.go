@@ -1,4 +1,4 @@
-func findMostFrequentWord() {
+func replaceWordInLines() {
     inputFile, err := os.Open("results.txt")
     if err != nil {
         log.Println("Error opening file:", err)
@@ -6,14 +6,27 @@ func findMostFrequentWord() {
     }
     defer inputFile.Close()
 
-    wordCounts := make(map[string]int)
+    tempFile, err := os.Create("results_temp.txt")
+    if err != nil {
+        log.Println("Error creating temporary file:", err)
+        return
+    }
+    defer tempFile.Close()
+
+    var oldWord, newWord string
+    fmt.Print("Enter the word to replace: ")
+    fmt.Scanln(&oldWord)
+    fmt.Print("Enter the new word: ")
+    fmt.Scanln(&newWord)
+
     scanner := bufio.NewScanner(inputFile)
 
     for scanner.Scan() {
         line := scanner.Text()
-        words := strings.Fields(line)
-        for _, word := range words {
-            wordCounts[word]++
+        updatedLine := strings.ReplaceAll(line, oldWord, newWord)
+        _, err := tempFile.WriteString(updatedLine + "\n")
+        if err != nil {
+            log.Println("Error writing to temporary file:", err)
         }
     }
 
@@ -21,19 +34,10 @@ func findMostFrequentWord() {
         log.Println("Error reading file:", err)
     }
 
-    mostFrequentWord := ""
-    highestCount := 0
-
-    for word, count := range wordCounts {
-        if count > highestCount {
-            mostFrequentWord = word
-            highestCount = count
-        }
+    err = os.Rename("results_temp.txt", "results.txt")
+    if err != nil {
+        log.Println("Error replacing original file:", err)
     }
 
-    if mostFrequentWord != "" {
-        fmt.Printf("The most frequent word is '%s', appearing %d times.\n", mostFrequentWord, highestCount)
-    } else {
-        fmt.Println("No words found in the file.")
-    }
+    fmt.Println("Word replacement completed successfully.")
 }
