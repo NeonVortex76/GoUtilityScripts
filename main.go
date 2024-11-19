@@ -1,4 +1,4 @@
-func calculateAverageLineLength() {
+func appendTimestampToLines() {
     inputFile, err := os.Open("results.txt")
     if err != nil {
         log.Println("Error opening file:", err)
@@ -6,24 +6,33 @@ func calculateAverageLineLength() {
     }
     defer inputFile.Close()
 
-    scanner := bufio.NewScanner(inputFile)
-    totalLength := 0
-    lineCount := 0
+    tempFile, err := os.Create("results_temp.txt")
+    if err != nil {
+        log.Println("Error creating temporary file:", err)
+        return
+    }
+    defer tempFile.Close()
 
+    currentTime := time.Now().Format("2006-01-02 15:04:05")
+
+    scanner := bufio.NewScanner(inputFile)
     for scanner.Scan() {
         line := scanner.Text()
-        totalLength += len(line)
-        lineCount++
+        updatedLine := fmt.Sprintf("%s [%s]", line, currentTime)
+        _, err := tempFile.WriteString(updatedLine + "\n")
+        if err != nil {
+            log.Println("Error writing to temporary file:", err)
+        }
     }
 
     if err := scanner.Err(); err != nil {
         log.Println("Error reading file:", err)
     }
 
-    if lineCount > 0 {
-        avgLength := float64(totalLength) / float64(lineCount)
-        fmt.Printf("Average line length: %.2f characters\n", avgLength)
-    } else {
-        fmt.Println("No lines found in the file.")
+    err = os.Rename("results_temp.txt", "results.txt")
+    if err != nil {
+        log.Println("Error replacing original file:", err)
     }
+
+    fmt.Println("Timestamps appended to lines successfully.")
 }
