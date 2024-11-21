@@ -1,4 +1,4 @@
-func filterLinesContainingWord() {
+func reverseLines() {
     inputFile, err := os.Open("results.txt")
     if err != nil {
         log.Println("Error opening file:", err)
@@ -13,18 +13,13 @@ func filterLinesContainingWord() {
     }
     defer tempFile.Close()
 
-    var filterWord string
-    fmt.Print("Enter the word to filter lines: ")
-    fmt.Scanln(&filterWord)
-
     scanner := bufio.NewScanner(inputFile)
     for scanner.Scan() {
         line := scanner.Text()
-        if strings.Contains(line, filterWord) {
-            _, err := tempFile.WriteString(line + "\n")
-            if err != nil {
-                log.Println("Error writing to temporary file:", err)
-            }
+        reversedLine := reverseString(line)
+        _, err := tempFile.WriteString(reversedLine + "\n")
+        if err != nil {
+            log.Println("Error writing to temporary file:", err)
         }
     }
 
@@ -37,5 +32,13 @@ func filterLinesContainingWord() {
         log.Println("Error replacing original file:", err)
     }
 
-    fmt.Println("Lines containing the specified word were filtered successfully.")
+    fmt.Println("Lines reversed successfully.")
+}
+
+func reverseString(s string) string {
+    runes := []rune(s)
+    for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
+        runes[i], runes[j] = runes[j], runes[i]
+    }
+    return string(runes)
 }
