@@ -1,4 +1,4 @@
-func duplicateLines() {
+func truncateLongLines(maxLength int) {
     inputFile, err := os.Open("results.txt")
     if err != nil {
         log.Println("Error opening file:", err)
@@ -16,7 +16,10 @@ func duplicateLines() {
     scanner := bufio.NewScanner(inputFile)
     for scanner.Scan() {
         line := scanner.Text()
-        _, err := tempFile.WriteString(line + "\n" + line + "\n")
+        if len(line) > maxLength {
+            line = line[:maxLength] + "..."
+        }
+        _, err := tempFile.WriteString(line + "\n")
         if err != nil {
             log.Println("Error writing to temporary file:", err)
         }
@@ -31,5 +34,5 @@ func duplicateLines() {
         log.Println("Error replacing original file:", err)
     }
 
-    fmt.Println("Lines duplicated successfully.")
+    fmt.Println("Lines truncated successfully.")
 }
