@@ -1,4 +1,4 @@
-func removeDuplicateLines() {
+func prependLineNumbers() {
     inputFile, err := os.Open("results.txt")
     if err != nil {
         log.Println("Error opening file:", err)
@@ -13,18 +13,17 @@ func removeDuplicateLines() {
     }
     defer tempFile.Close()
 
-    lineSet := make(map[string]struct{})
     scanner := bufio.NewScanner(inputFile)
+    lineNumber := 1
 
     for scanner.Scan() {
         line := scanner.Text()
-        if _, exists := lineSet[line]; !exists {
-            lineSet[line] = struct{}{}
-            _, err := tempFile.WriteString(line + "\n")
-            if err != nil {
-                log.Println("Error writing to temporary file:", err)
-            }
+        numberedLine := fmt.Sprintf("%d: %s", lineNumber, line)
+        _, err := tempFile.WriteString(numberedLine + "\n")
+        if err != nil {
+            log.Println("Error writing to temporary file:", err)
         }
+        lineNumber++
     }
 
     if err := scanner.Err(); err != nil {
@@ -36,5 +35,5 @@ func removeDuplicateLines() {
         log.Println("Error replacing original file:", err)
     }
 
-    fmt.Println("Duplicate lines removed successfully.")
+    fmt.Println("Line numbers prepended successfully.")
 }
