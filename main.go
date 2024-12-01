@@ -1,10 +1,22 @@
-func filterLinesContaining(substring string) {
+func reverseLineOrder() {
     inputFile, err := os.Open("results.txt")
     if err != nil {
         log.Println("Error opening file:", err)
         return
     }
     defer inputFile.Close()
+
+    var lines []string
+    scanner := bufio.NewScanner(inputFile)
+
+    for scanner.Scan() {
+        lines = append(lines, scanner.Text())
+    }
+
+    if err := scanner.Err(); err != nil {
+        log.Println("Error reading file:", err)
+        return
+    }
 
     tempFile, err := os.Create("results_temp.txt")
     if err != nil {
@@ -13,19 +25,11 @@ func filterLinesContaining(substring string) {
     }
     defer tempFile.Close()
 
-    scanner := bufio.NewScanner(inputFile)
-    for scanner.Scan() {
-        line := scanner.Text()
-        if strings.Contains(line, substring) {
-            _, err := tempFile.WriteString(line + "\n")
-            if err != nil {
-                log.Println("Error writing to temporary file:", err)
-            }
+    for i := len(lines) - 1; i >= 0; i-- {
+        _, err := tempFile.WriteString(lines[i] + "\n")
+        if err != nil {
+            log.Println("Error writing to temporary file:", err)
         }
-    }
-
-    if err := scanner.Err(); err != nil {
-        log.Println("Error reading file:", err)
     }
 
     err = os.Rename("results_temp.txt", "results.txt")
@@ -33,5 +37,5 @@ func filterLinesContaining(substring string) {
         log.Println("Error replacing original file:", err)
     }
 
-    fmt.Println("Filtered lines containing substring successfully.")
+    fmt.Println("Reversed line order successfully.")
 }
