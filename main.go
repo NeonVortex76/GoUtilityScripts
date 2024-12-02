@@ -1,4 +1,4 @@
-func reverseLineOrder() {
+func countLineOccurrences() {
     inputFile, err := os.Open("results.txt")
     if err != nil {
         log.Println("Error opening file:", err)
@@ -6,11 +6,12 @@ func reverseLineOrder() {
     }
     defer inputFile.Close()
 
-    var lines []string
+    lineCounts := make(map[string]int)
     scanner := bufio.NewScanner(inputFile)
 
     for scanner.Scan() {
-        lines = append(lines, scanner.Text())
+        line := scanner.Text()
+        lineCounts[line]++
     }
 
     if err := scanner.Err(); err != nil {
@@ -25,8 +26,8 @@ func reverseLineOrder() {
     }
     defer tempFile.Close()
 
-    for i := len(lines) - 1; i >= 0; i-- {
-        _, err := tempFile.WriteString(lines[i] + "\n")
+    for line, count := range lineCounts {
+        _, err := tempFile.WriteString(fmt.Sprintf("%s (x%d)\n", line, count))
         if err != nil {
             log.Println("Error writing to temporary file:", err)
         }
@@ -37,5 +38,5 @@ func reverseLineOrder() {
         log.Println("Error replacing original file:", err)
     }
 
-    fmt.Println("Reversed line order successfully.")
+    fmt.Println("Line occurrences counted successfully.")
 }
