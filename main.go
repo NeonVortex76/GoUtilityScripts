@@ -1,4 +1,4 @@
-func truncateLines(maxLength int) {
+func appendTimestampToLines() {
     inputFile, err := os.Open("results.txt")
     if err != nil {
         log.Println("Error opening file:", err)
@@ -14,12 +14,12 @@ func truncateLines(maxLength int) {
     defer tempFile.Close()
 
     scanner := bufio.NewScanner(inputFile)
+    timestamp := time.Now().Format("2006-01-02 15:04:05")
+
     for scanner.Scan() {
         line := scanner.Text()
-        if len(line) > maxLength {
-            line = line[:maxLength]
-        }
-        _, err := tempFile.WriteString(line + "\n")
+        updatedLine := fmt.Sprintf("%s [%s]", line, timestamp)
+        _, err := tempFile.WriteString(updatedLine + "\n")
         if err != nil {
             log.Println("Error writing to temporary file:", err)
         }
@@ -34,5 +34,5 @@ func truncateLines(maxLength int) {
         log.Println("Error replacing original file:", err)
     }
 
-    fmt.Println("Truncated lines to a maximum length successfully.")
+    fmt.Println("Appended timestamp to each line successfully.")
 }
