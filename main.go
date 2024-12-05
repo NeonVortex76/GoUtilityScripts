@@ -1,4 +1,4 @@
-func appendTimestampToLines() {
+func removeEmptyLines() {
     inputFile, err := os.Open("results.txt")
     if err != nil {
         log.Println("Error opening file:", err)
@@ -14,14 +14,13 @@ func appendTimestampToLines() {
     defer tempFile.Close()
 
     scanner := bufio.NewScanner(inputFile)
-    timestamp := time.Now().Format("2006-01-02 15:04:05")
-
     for scanner.Scan() {
         line := scanner.Text()
-        updatedLine := fmt.Sprintf("%s [%s]", line, timestamp)
-        _, err := tempFile.WriteString(updatedLine + "\n")
-        if err != nil {
-            log.Println("Error writing to temporary file:", err)
+        if strings.TrimSpace(line) != "" {
+            _, err := tempFile.WriteString(line + "\n")
+            if err != nil {
+                log.Println("Error writing to temporary file:", err)
+            }
         }
     }
 
@@ -34,5 +33,5 @@ func appendTimestampToLines() {
         log.Println("Error replacing original file:", err)
     }
 
-    fmt.Println("Appended timestamp to each line successfully.")
+    fmt.Println("Removed empty lines successfully.")
 }
