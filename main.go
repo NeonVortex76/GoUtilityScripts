@@ -1,4 +1,4 @@
-func removeEmptyLines() {
+func replaceWordInLines(oldWord, newWord string) {
     inputFile, err := os.Open("results.txt")
     if err != nil {
         log.Println("Error opening file:", err)
@@ -16,11 +16,10 @@ func removeEmptyLines() {
     scanner := bufio.NewScanner(inputFile)
     for scanner.Scan() {
         line := scanner.Text()
-        if strings.TrimSpace(line) != "" {
-            _, err := tempFile.WriteString(line + "\n")
-            if err != nil {
-                log.Println("Error writing to temporary file:", err)
-            }
+        updatedLine := strings.ReplaceAll(line, oldWord, newWord)
+        _, err := tempFile.WriteString(updatedLine + "\n")
+        if err != nil {
+            log.Println("Error writing to temporary file:", err)
         }
     }
 
@@ -33,5 +32,5 @@ func removeEmptyLines() {
         log.Println("Error replacing original file:", err)
     }
 
-    fmt.Println("Removed empty lines successfully.")
+    fmt.Println("Replaced occurrences of words successfully.")
 }
