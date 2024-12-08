@@ -1,4 +1,4 @@
-func duplicateLines() {
+func reverseLines() {
     inputFile, err := os.Open("results.txt")
     if err != nil {
         log.Println("Error opening file:", err)
@@ -16,7 +16,8 @@ func duplicateLines() {
     scanner := bufio.NewScanner(inputFile)
     for scanner.Scan() {
         line := scanner.Text()
-        _, err := tempFile.WriteString(line + "\n" + line + "\n")
+        reversedLine := reverseString(line)
+        _, err := tempFile.WriteString(reversedLine + "\n")
         if err != nil {
             log.Println("Error writing to temporary file:", err)
         }
@@ -31,5 +32,13 @@ func duplicateLines() {
         log.Println("Error replacing original file:", err)
     }
 
-    fmt.Println("Duplicated lines successfully.")
+    fmt.Println("Reversed lines successfully.")
+}
+
+func reverseString(input string) string {
+    runes := []rune(input)
+    for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
+        runes[i], runes[j] = runes[j], runes[i]
+    }
+    return string(runes)
 }
