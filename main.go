@@ -1,4 +1,4 @@
-func reverseLines() {
+func prependLineNumbers() {
     inputFile, err := os.Open("results.txt")
     if err != nil {
         log.Println("Error opening file:", err)
@@ -14,13 +14,15 @@ func reverseLines() {
     defer tempFile.Close()
 
     scanner := bufio.NewScanner(inputFile)
+    lineNumber := 1
     for scanner.Scan() {
         line := scanner.Text()
-        reversedLine := reverseString(line)
-        _, err := tempFile.WriteString(reversedLine + "\n")
+        numberedLine := fmt.Sprintf("%d: %s", lineNumber, line)
+        _, err := tempFile.WriteString(numberedLine + "\n")
         if err != nil {
             log.Println("Error writing to temporary file:", err)
         }
+        lineNumber++
     }
 
     if err := scanner.Err(); err != nil {
@@ -32,13 +34,5 @@ func reverseLines() {
         log.Println("Error replacing original file:", err)
     }
 
-    fmt.Println("Reversed lines successfully.")
-}
-
-func reverseString(input string) string {
-    runes := []rune(input)
-    for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
-        runes[i], runes[j] = runes[j], runes[i]
-    }
-    return string(runes)
+    fmt.Println("Prepended line numbers successfully.")
 }
