@@ -1,4 +1,4 @@
-func prependLineNumbers() {
+func filterLinesContaining(keyword string) {
     inputFile, err := os.Open("results.txt")
     if err != nil {
         log.Println("Error opening file:", err)
@@ -14,15 +14,14 @@ func prependLineNumbers() {
     defer tempFile.Close()
 
     scanner := bufio.NewScanner(inputFile)
-    lineNumber := 1
     for scanner.Scan() {
         line := scanner.Text()
-        numberedLine := fmt.Sprintf("%d: %s", lineNumber, line)
-        _, err := tempFile.WriteString(numberedLine + "\n")
-        if err != nil {
-            log.Println("Error writing to temporary file:", err)
+        if strings.Contains(line, keyword) {
+            _, err := tempFile.WriteString(line + "\n")
+            if err != nil {
+                log.Println("Error writing to temporary file:", err)
+            }
         }
-        lineNumber++
     }
 
     if err := scanner.Err(); err != nil {
@@ -34,5 +33,5 @@ func prependLineNumbers() {
         log.Println("Error replacing original file:", err)
     }
 
-    fmt.Println("Prepended line numbers successfully.")
+    fmt.Println("Filtered lines containing the keyword successfully.")
 }
