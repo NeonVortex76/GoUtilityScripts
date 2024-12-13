@@ -1,10 +1,21 @@
-func duplicateEachLine() {
+func removeDuplicateLines() {
     inputFile, err := os.Open("results.txt")
     if err != nil {
         log.Println("Error opening file:", err)
         return
     }
     defer inputFile.Close()
+
+    lineSet := make(map[string]struct{})
+    scanner := bufio.NewScanner(inputFile)
+    for scanner.Scan() {
+        lineSet[scanner.Text()] = struct{}{}
+    }
+
+    if err := scanner.Err(); err != nil {
+        log.Println("Error reading file:", err)
+        return
+    }
 
     tempFile, err := os.Create("results_temp.txt")
     if err != nil {
@@ -13,17 +24,11 @@ func duplicateEachLine() {
     }
     defer tempFile.Close()
 
-    scanner := bufio.NewScanner(inputFile)
-    for scanner.Scan() {
-        line := scanner.Text()
-        _, err := tempFile.WriteString(line + "\n" + line + "\n")
+    for line := range lineSet {
+        _, err := tempFile.WriteString(line + "\n")
         if err != nil {
             log.Println("Error writing to temporary file:", err)
         }
-    }
-
-    if err := scanner.Err(); err != nil {
-        log.Println("Error reading file:", err)
     }
 
     err = os.Rename("results_temp.txt", "results.txt")
@@ -31,5 +36,5 @@ func duplicateEachLine() {
         log.Println("Error replacing original file:", err)
     }
 
-    fmt.Println("Duplicated each line successfully.")
+    fmt.Println("Removed duplicate lines successfully.")
 }
