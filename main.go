@@ -1,4 +1,4 @@
-func removeDuplicateLines() {
+func reverseLineOrder() {
     inputFile, err := os.Open("results.txt")
     if err != nil {
         log.Println("Error opening file:", err)
@@ -6,10 +6,10 @@ func removeDuplicateLines() {
     }
     defer inputFile.Close()
 
-    lineSet := make(map[string]struct{})
+    var lines []string
     scanner := bufio.NewScanner(inputFile)
     for scanner.Scan() {
-        lineSet[scanner.Text()] = struct{}{}
+        lines = append(lines, scanner.Text())
     }
 
     if err := scanner.Err(); err != nil {
@@ -24,8 +24,8 @@ func removeDuplicateLines() {
     }
     defer tempFile.Close()
 
-    for line := range lineSet {
-        _, err := tempFile.WriteString(line + "\n")
+    for i := len(lines) - 1; i >= 0; i-- {
+        _, err := tempFile.WriteString(lines[i] + "\n")
         if err != nil {
             log.Println("Error writing to temporary file:", err)
         }
@@ -36,5 +36,5 @@ func removeDuplicateLines() {
         log.Println("Error replacing original file:", err)
     }
 
-    fmt.Println("Removed duplicate lines successfully.")
+    fmt.Println("Reversed line order successfully.")
 }
