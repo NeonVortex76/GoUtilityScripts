@@ -1,4 +1,4 @@
-func countLines() {
+func findLongestLine() {
     inputFile, err := os.Open("results.txt")
     if err != nil {
         log.Println("Error opening file:", err)
@@ -6,10 +6,16 @@ func countLines() {
     }
     defer inputFile.Close()
 
-    lineCount := 0
+    var longestLine string
+    maxLen := 0
+
     scanner := bufio.NewScanner(inputFile)
     for scanner.Scan() {
-        lineCount++
+        line := scanner.Text()
+        if len(line) > maxLen {
+            longestLine = line
+            maxLen = len(line)
+        }
     }
 
     if err := scanner.Err(); err != nil {
@@ -17,5 +23,5 @@ func countLines() {
         return
     }
 
-    fmt.Printf("Total number of lines: %d\n", lineCount)
+    fmt.Printf("Longest line (%d characters): %s\n", maxLen, longestLine)
 }
