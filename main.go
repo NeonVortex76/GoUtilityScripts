@@ -1,4 +1,4 @@
-func findLongestLine() {
+func prependTimestampToLines() {
     inputFile, err := os.Open("results.txt")
     if err != nil {
         log.Println("Error opening file:", err)
@@ -6,22 +6,31 @@ func findLongestLine() {
     }
     defer inputFile.Close()
 
-    var longestLine string
-    maxLen := 0
+    tempFile, err := os.Create("results_temp.txt")
+    if err != nil {
+        log.Println("Error creating temporary file:", err)
+        return
+    }
+    defer tempFile.Close()
 
     scanner := bufio.NewScanner(inputFile)
     for scanner.Scan() {
         line := scanner.Text()
-        if len(line) > maxLen {
-            longestLine = line
-            maxLen = len(line)
+        timestamp := time.Now().Format("2006-01-02 15:04:05")
+        _, err := tempFile.WriteString(fmt.Sprintf("[%s] %s\n", timestamp, line))
+        if err != nil {
+            log.Println("Error writing to temporary file:", err)
         }
     }
 
     if err := scanner.Err(); err != nil {
         log.Println("Error reading file:", err)
-        return
     }
 
-    fmt.Printf("Longest line (%d characters): %s\n", maxLen, longestLine)
+    err = os.Rename("results_temp.txt", "results.txt")
+    if err != nil {
+        log.Println("Error replacing original file:", err)
+    }
+
+    fmt.Println("Prepended timestamp to each line successfully.")
 }
