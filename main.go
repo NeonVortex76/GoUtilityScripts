@@ -1,4 +1,4 @@
-func prependTimestampToLines() {
+func filterLinesContaining(keyword string) {
     inputFile, err := os.Open("results.txt")
     if err != nil {
         log.Println("Error opening file:", err)
@@ -16,10 +16,11 @@ func prependTimestampToLines() {
     scanner := bufio.NewScanner(inputFile)
     for scanner.Scan() {
         line := scanner.Text()
-        timestamp := time.Now().Format("2006-01-02 15:04:05")
-        _, err := tempFile.WriteString(fmt.Sprintf("[%s] %s\n", timestamp, line))
-        if err != nil {
-            log.Println("Error writing to temporary file:", err)
+        if strings.Contains(line, keyword) {
+            _, err := tempFile.WriteString(line + "\n")
+            if err != nil {
+                log.Println("Error writing to temporary file:", err)
+            }
         }
     }
 
@@ -32,5 +33,5 @@ func prependTimestampToLines() {
         log.Println("Error replacing original file:", err)
     }
 
-    fmt.Println("Prepended timestamp to each line successfully.")
+    fmt.Printf("Filtered lines containing '%s' successfully.\n", keyword)
 }
