@@ -1,4 +1,4 @@
-func filterLinesContaining(keyword string) {
+func removeDuplicateLines() {
     inputFile, err := os.Open("results.txt")
     if err != nil {
         log.Println("Error opening file:", err)
@@ -13,10 +13,12 @@ func filterLinesContaining(keyword string) {
     }
     defer tempFile.Close()
 
+    lineSet := make(map[string]bool)
     scanner := bufio.NewScanner(inputFile)
     for scanner.Scan() {
         line := scanner.Text()
-        if strings.Contains(line, keyword) {
+        if !lineSet[line] {
+            lineSet[line] = true
             _, err := tempFile.WriteString(line + "\n")
             if err != nil {
                 log.Println("Error writing to temporary file:", err)
@@ -33,5 +35,5 @@ func filterLinesContaining(keyword string) {
         log.Println("Error replacing original file:", err)
     }
 
-    fmt.Printf("Filtered lines containing '%s' successfully.\n", keyword)
+    fmt.Println("Removed duplicate lines successfully.")
 }
