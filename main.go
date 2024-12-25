@@ -1,4 +1,4 @@
-func appendTimestampToEachLine() {
+func replaceWordInFile(oldWord, newWord string) {
     inputFile, err := os.Open("results.txt")
     if err != nil {
         log.Println("Error opening file:", err)
@@ -13,11 +13,10 @@ func appendTimestampToEachLine() {
     }
     defer tempFile.Close()
 
-    currentTime := time.Now().Format("2006-01-02 15:04:05")
     scanner := bufio.NewScanner(inputFile)
     for scanner.Scan() {
         line := scanner.Text()
-        updatedLine := fmt.Sprintf("%s [%s]", line, currentTime)
+        updatedLine := strings.ReplaceAll(line, oldWord, newWord)
         _, err := tempFile.WriteString(updatedLine + "\n")
         if err != nil {
             log.Println("Error writing to temporary file:", err)
@@ -34,5 +33,5 @@ func appendTimestampToEachLine() {
         log.Println("Error replacing original file:", err)
     }
 
-    fmt.Println("Appended timestamps to each line successfully.")
+    fmt.Printf("Replaced all occurrences of '%s' with '%s' successfully.\n", oldWord, newWord)
 }
