@@ -1,40 +1,23 @@
-func reverseLinesInFile() {
+func countWordOccurrences(word string) int {
     inputFile, err := os.Open("results.txt")
     if err != nil {
         log.Println("Error opening file:", err)
-        return
+        return 0
     }
     defer inputFile.Close()
 
-    var lines []string
+    count := 0
     scanner := bufio.NewScanner(inputFile)
     for scanner.Scan() {
-        lines = append(lines, scanner.Text())
+        line := scanner.Text()
+        count += strings.Count(line, word)
     }
 
     if err := scanner.Err(); err != nil {
         log.Println("Error reading file:", err)
-        return
+        return 0
     }
 
-    tempFile, err := os.Create("results_temp.txt")
-    if err != nil {
-        log.Println("Error creating temporary file:", err)
-        return
-    }
-    defer tempFile.Close()
-
-    for i := len(lines) - 1; i >= 0; i-- {
-        _, err := tempFile.WriteString(lines[i] + "\n")
-        if err != nil {
-            log.Println("Error writing to temporary file:", err)
-        }
-    }
-
-    err = os.Rename("results_temp.txt", "results.txt")
-    if err != nil {
-        log.Println("Error replacing original file:", err)
-    }
-
-    fmt.Println("Reversed all lines in the file successfully.")
+    fmt.Printf("The word '%s' appears %d times in the file.\n", word, count)
+    return count
 }
