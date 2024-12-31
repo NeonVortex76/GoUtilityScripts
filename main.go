@@ -1,4 +1,4 @@
-func duplicateLines() {
+func removeDuplicateLines() {
     inputFile, err := os.Open("results.txt")
     if err != nil {
         log.Println("Error opening file:", err)
@@ -13,12 +13,16 @@ func duplicateLines() {
     }
     defer tempFile.Close()
 
+    seen := make(map[string]bool)
     scanner := bufio.NewScanner(inputFile)
     for scanner.Scan() {
         line := scanner.Text()
-        _, err := tempFile.WriteString(line + "\n" + line + "\n")
-        if err != nil {
-            log.Println("Error writing to temporary file:", err)
+        if !seen[line] {
+            seen[line] = true
+            _, err := tempFile.WriteString(line + "\n")
+            if err != nil {
+                log.Println("Error writing to temporary file:", err)
+            }
         }
     }
 
@@ -32,5 +36,5 @@ func duplicateLines() {
         log.Println("Error replacing original file:", err)
     }
 
-    fmt.Println("Duplicated all lines in the file successfully.")
+    fmt.Println("Removed duplicate lines successfully.")
 }
