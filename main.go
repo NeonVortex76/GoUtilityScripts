@@ -1,40 +1,17 @@
-func removeDuplicateLines() {
-    inputFile, err := os.Open("results.txt")
+func appendTimestampToFile() {
+    file, err := os.OpenFile("results.txt", os.O_APPEND|os.O_WRONLY, 0644)
     if err != nil {
         log.Println("Error opening file:", err)
         return
     }
-    defer inputFile.Close()
+    defer file.Close()
 
-    tempFile, err := os.Create("results_temp.txt")
+    timestamp := time.Now().Format("2006-01-02 15:04:05")
+    _, err = file.WriteString("Timestamp: " + timestamp + "\n")
     if err != nil {
-        log.Println("Error creating temporary file:", err)
-        return
-    }
-    defer tempFile.Close()
-
-    seen := make(map[string]bool)
-    scanner := bufio.NewScanner(inputFile)
-    for scanner.Scan() {
-        line := scanner.Text()
-        if !seen[line] {
-            seen[line] = true
-            _, err := tempFile.WriteString(line + "\n")
-            if err != nil {
-                log.Println("Error writing to temporary file:", err)
-            }
-        }
-    }
-
-    if err := scanner.Err(); err != nil {
-        log.Println("Error reading file:", err)
+        log.Println("Error writing to file:", err)
         return
     }
 
-    err = os.Rename("results_temp.txt", "results.txt")
-    if err != nil {
-        log.Println("Error replacing original file:", err)
-    }
-
-    fmt.Println("Removed duplicate lines successfully.")
+    fmt.Println("Appended current timestamp to the file successfully.")
 }
