@@ -1,17 +1,28 @@
-func appendTimestampToFile() {
-    file, err := os.OpenFile("results.txt", os.O_APPEND|os.O_WRONLY, 0644)
+func findLongestLine() string {
+    inputFile, err := os.Open("results.txt")
     if err != nil {
         log.Println("Error opening file:", err)
-        return
+        return ""
     }
-    defer file.Close()
+    defer inputFile.Close()
 
-    timestamp := time.Now().Format("2006-01-02 15:04:05")
-    _, err = file.WriteString("Timestamp: " + timestamp + "\n")
-    if err != nil {
-        log.Println("Error writing to file:", err)
-        return
+    var longestLine string
+    maxLength := 0
+
+    scanner := bufio.NewScanner(inputFile)
+    for scanner.Scan() {
+        line := scanner.Text()
+        if len(line) > maxLength {
+            maxLength = len(line)
+            longestLine = line
+        }
     }
 
-    fmt.Println("Appended current timestamp to the file successfully.")
+    if err := scanner.Err(); err != nil {
+        log.Println("Error reading file:", err)
+        return ""
+    }
+
+    fmt.Printf("The longest line is: %q\n", longestLine)
+    return longestLine
 }
