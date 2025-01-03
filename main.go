@@ -1,28 +1,25 @@
-func findLongestLine() string {
+func countLinesContaining(substring string) int {
     inputFile, err := os.Open("results.txt")
     if err != nil {
         log.Println("Error opening file:", err)
-        return ""
+        return 0
     }
     defer inputFile.Close()
 
-    var longestLine string
-    maxLength := 0
-
+    count := 0
     scanner := bufio.NewScanner(inputFile)
     for scanner.Scan() {
         line := scanner.Text()
-        if len(line) > maxLength {
-            maxLength = len(line)
-            longestLine = line
+        if strings.Contains(line, substring) {
+            count++
         }
     }
 
     if err := scanner.Err(); err != nil {
         log.Println("Error reading file:", err)
-        return ""
+        return 0
     }
 
-    fmt.Printf("The longest line is: %q\n", longestLine)
-    return longestLine
+    fmt.Printf("The substring %q appears in %d lines.\n", substring, count)
+    return count
 }
