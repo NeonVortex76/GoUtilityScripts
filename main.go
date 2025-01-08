@@ -1,16 +1,23 @@
-func appendTimestampToFile() {
-    file, err := os.OpenFile("results.txt", os.O_APPEND|os.O_WRONLY, 0644)
+func countOccurrences(word string) int {
+    inputFile, err := os.Open("results.txt")
     if err != nil {
         log.Println("Error opening file:", err)
-        return
+        return 0
     }
-    defer file.Close()
+    defer inputFile.Close()
 
-    timestamp := time.Now().Format("2006-01-02 15:04:05")
-    _, err = file.WriteString("Timestamp: " + timestamp + "\n")
-    if err != nil {
-        log.Println("Error writing to file:", err)
+    count := 0
+    scanner := bufio.NewScanner(inputFile)
+    for scanner.Scan() {
+        line := scanner.Text()
+        count += strings.Count(line, word)
     }
 
-    fmt.Println("Appended current timestamp to file.")
+    if err := scanner.Err(); err != nil {
+        log.Println("Error reading file:", err)
+        return 0
+    }
+
+    fmt.Printf("The word %q appears %d times in the file.\n", word, count)
+    return count
 }
