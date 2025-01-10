@@ -1,4 +1,4 @@
-func removeEmptyLines() {
+func duplicateLines(lineNumber int) {
     inputFile, err := os.Open("results.txt")
     if err != nil {
         log.Println("Error opening file:", err)
@@ -14,14 +14,21 @@ func removeEmptyLines() {
     defer tempFile.Close()
 
     scanner := bufio.NewScanner(inputFile)
+    currentLine := 1
     for scanner.Scan() {
         line := scanner.Text()
-        if strings.TrimSpace(line) != "" {
+        _, err := tempFile.WriteString(line + "\n")
+        if err != nil {
+            log.Println("Error writing to temporary file:", err)
+        }
+
+        if currentLine == lineNumber {
             _, err := tempFile.WriteString(line + "\n")
             if err != nil {
-                log.Println("Error writing to temporary file:", err)
+                log.Println("Error duplicating line in temporary file:", err)
             }
         }
+        currentLine++
     }
 
     if err := scanner.Err(); err != nil {
@@ -34,5 +41,5 @@ func removeEmptyLines() {
         log.Println("Error replacing original file:", err)
     }
 
-    fmt.Println("Removed empty lines from file.")
+    fmt.Printf("Duplicated line %d in the file.\n", lineNumber)
 }
