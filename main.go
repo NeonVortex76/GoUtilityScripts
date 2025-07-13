@@ -12,22 +12,30 @@ func duplicateLines(lineNumber int) {
         return
     }
 
-    scanner := bufio.NewScanner(inputFile)
-    for currentLine := 1; scanner.Scan(); currentLine++ {
-        line := scanner.Text()
-        fmt.Fprintln(tempFile, line)
-        if currentLine == lineNumber {
-            fmt.Fprintln(tempFile, line)
+    reader := bufio.NewReader(inputFile)
+    writer := bufio.NewWriter(tempFile)
+
+    currentLine := 1
+    for {
+        line, err := reader.ReadString('\n')
+        if err == io.EOF {
+            break
         }
+        if err != nil {
+            log.Println("Error reading line:", err)
+            inputFile.Close()
+            tempFile.Close()
+            return
+        }
+
+        writer.WriteString(line)
+        if currentLine == lineNumber {
+            writer.WriteString(line)
+        }
+        currentLine++
     }
 
-    if err := scanner.Err(); err != nil {
-        log.Println("Error reading file:", err)
-        inputFile.Close()
-        tempFile.Close()
-        return
-    }
-
+    writer.Flush()
     if err1, err2 := inputFile.Close(), tempFile.Close(); err1 != nil || err2 != nil {
         log.Println("Error closing files")
         return
