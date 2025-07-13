@@ -15,7 +15,10 @@ func duplicateLines(lineNumber int) {
     scanner := bufio.NewScanner(inputFile)
     for currentLine := 1; scanner.Scan(); currentLine++ {
         line := scanner.Text()
-        writeLineTwiceIfNeeded(tempFile, line, currentLine == lineNumber)
+        fmt.Fprintln(tempFile, line)
+        if currentLine == lineNumber {
+            fmt.Fprintln(tempFile, line)
+        }
     }
 
     inputFile.Close()
@@ -31,11 +34,4 @@ func duplicateLines(lineNumber int) {
     }
 
     fmt.Printf("Duplicated line %d in the file.\n", lineNumber)
-}
-
-func writeLineTwiceIfNeeded(f *os.File, line string, duplicate bool) {
-    fmt.Fprintln(f, line)
-    if duplicate {
-        fmt.Fprintln(f, line)
-    }
 }
