@@ -12,12 +12,6 @@ func duplicateLines(lineNumber int) {
         return
     }
 
-    cleanup := func() {
-        inputFile.Close()
-        tempFile.Close()
-    }
-    defer cleanup()
-
     scanner := bufio.NewScanner(inputFile)
     for currentLine := 1; scanner.Scan(); currentLine++ {
         line := scanner.Text()
@@ -29,11 +23,19 @@ func duplicateLines(lineNumber int) {
 
     if err := scanner.Err(); err != nil {
         log.Println("Error reading file:", err)
+        inputFile.Close()
+        tempFile.Close()
+        return
+    }
+
+    if err1, err2 := inputFile.Close(), tempFile.Close(); err1 != nil || err2 != nil {
+        log.Println("Error closing files")
         return
     }
 
     if err := os.Rename("results_temp.txt", "results.txt"); err != nil {
         log.Println("Error replacing original file:", err)
+        return
     }
 
     log.Printf("Duplicated line %d in the file.\n", lineNumber)
