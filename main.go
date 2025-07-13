@@ -4,13 +4,14 @@ func duplicateLines(lineNumber int) {
         log.Println("Error opening file:", err)
         return
     }
+    defer inputFile.Close()
 
     tempFile, err := os.Create("results_temp.txt")
     if err != nil {
         log.Println("Error creating temporary file:", err)
-        inputFile.Close()
         return
     }
+    defer tempFile.Close()
 
     reader := bufio.NewReader(inputFile)
     writer := bufio.NewWriter(tempFile)
@@ -23,8 +24,6 @@ func duplicateLines(lineNumber int) {
         }
         if err != nil {
             log.Println("Error reading line:", err)
-            inputFile.Close()
-            tempFile.Close()
             return
         }
 
@@ -35,9 +34,8 @@ func duplicateLines(lineNumber int) {
         currentLine++
     }
 
-    writer.Flush()
-    if err1, err2 := inputFile.Close(), tempFile.Close(); err1 != nil || err2 != nil {
-        log.Println("Error closing files")
+    if err := writer.Flush(); err != nil {
+        log.Println("Error flushing to file:", err)
         return
     }
 
